@@ -1,10 +1,163 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'layout/base.html' %}
 
-</body>
-</html>
+{% block content %}
+
+<div class="container">
+    <h2 class="text-center my-4" style="color: #ff5722; font-weight: bold;">Flight Booking</h2>
+    <div class="form-section p-4 rounded" style="background-color: #fff8f0; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+        <form method="GET" action="/search">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="departure" class="form-label">Từ (Departure)</label>
+                        <input class="form-control" list="departures" name="departure" id="departure"
+                               placeholder="Tìm thành phố hoặc sân bay">
+                        <datalist id="departures">
+                            {% for airport in airports %}
+                            <option value="{{ airport.airport_name }}">
+                                {% endfor %}
+                        </datalist>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="arrival" class="form-label">Đến (Arrival)</label>
+                        <input class="form-control" list="arrivals" name="arrival" id="arrival"
+                               placeholder="Tìm thành phố hoặc sân bay">
+                        <datalist id="arrivals">
+                            {% for airport in airports %}
+                            <option value="{{ airport.airport_name }}">
+                                {% endfor %}
+                        </datalist>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Ngày khởi hành</label>
+                    <input type="date" class="form-control mt-2" id="departure_date" placeholder="Ngày khởi hành"
+                           name="departure_date" required>
+
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check d-flex align-items-center mb-3">
+                        <input class="form-check-input me-2" type="checkbox" id="roundTrip" checked
+                               onclick="toggleReturnDate()">
+                        <label class="form-check-label" for="roundTrip" style="font-weight: bold;">Khứ hồi</label>
+                    </div>
+                    <input type="date" class="form-control" id="return_date" name="return_date">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Hành khách</label>
+                    <select class="form-select" name="passenger_count">
+                        <option value="1">1 Người lớn</option>
+                        <option value="2">2 Người lớn</option>
+                        <option value="3">3 Người lớn</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Hạng vé</label>
+                    <select class="form-select" name="class">
+                        <option value="economy">Phổ thông</option>
+                        <option value="business">Thương gia</option>
+                    </select>
+                </div>
+            </div>
+            <div class="d-grid">
+                <button type="submit" class="btn btn-orange text-white"
+                        style="background-color: #ff5722; border: none;">
+                    Tìm kiếm
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6">
+            <a href="#" target="_blank">
+                <img src="https://ik.imagekit.io/tvlk/image/imageResource/2024/11/26/1732628887544-87c0e830e4ad42fdd1234387a27d78cf.jpeg?tr=q-75"
+                     class="img-fluid rounded shadow" alt="Hình ảnh 1">
+            </a>
+        </div>
+        <div class="col-md-6">
+            <img src="https://ik.imagekit.io/tvlk/image/imageResource/2024/11/26/1732628887544-87c0e830e4ad42fdd1234387a27d78cf.jpeg?tr=q-75"
+                 class="img-fluid rounded shadow" alt="Hình ảnh 2">
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6">
+            <a href="#" target="_blank">
+                <img src="https://ik.imagekit.io/tvlk/image/imageResource/2024/11/26/1732628887544-87c0e830e4ad42fdd1234387a27d78cf.jpeg?tr=q-75"
+                     class="img-fluid rounded shadow" alt="Hình ảnh 1">
+            </a>
+        </div>
+        <div class="col-md-6">
+            <img src="https://ik.imagekit.io/tvlk/image/imageResource/2024/11/26/1732628887544-87c0e830e4ad42fdd1234387a27d78cf.jpeg?tr=q-75"
+                 class="img-fluid rounded shadow" alt="Hình ảnh 2">
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6">
+            <a href="#" target="_blank">
+                <img src="https://ik.imagekit.io/tvlk/image/imageResource/2024/11/26/1732628887544-87c0e830e4ad42fdd1234387a27d78cf.jpeg?tr=q-75"
+                     class="img-fluid rounded shadow" alt="Hình ảnh 1">
+            </a>
+        </div>
+        <div class="col-md-6">
+            <img src="https://ik.imagekit.io/tvlk/image/imageResource/2024/11/26/1732628887544-87c0e830e4ad42fdd1234387a27d78cf.jpeg?tr=q-75"
+                 class="img-fluid rounded shadow" alt="Hình ảnh 2">
+        </div>
+    </div>
+</div>
+
+
+<div class="container mt-5"><h2 class="mb-4">Các chuyến bay pổ biến</h2>
+    <div class="row"> <!-- Chuyến bay 1 -->
+        <div class="col-md-3">
+            <div class="card"><img src="{{ airports[0].airport_image }}" class="card-img-top" alt="Hình ảnh Nha Trang">
+                <div class="card-body"><h5 class="card-title">Hà Nội - Nha Trang</h5>
+                    <p class="card-text">Ngày: 25 - 27 Tháng 12 2024</p>
+                    <p class="card-text">Hãng: VietJet Air</p>
+                    <p class="card-text">Giá: 2.281.000 VND</p></div>
+            </div>
+        </div> <!-- Chuyến bay 2 -->
+        <div class="col-md-3">
+            <div class="card"><img src="{{ airports[0].airport_image }}" class="card-img-top" alt="Hình ảnh TP HCM">
+                <div class="card-body"><h5 class="card-title">Hà Nội - TP HCM</h5>
+                    <p class="card-text">Ngày: 18 - 19 Tháng 12 2024</p>
+                    <p class="card-text">Hãng: Vietravel Airlines - VietJet Air</p>
+                    <p class="card-text">Giá: 2.860.289 VND</p></div>
+            </div>
+        </div> <!-- Chuyến bay 3 -->
+        <div class="col-md-3">
+            <div class="card"><img src="{{ airports[0].airport_image }}" class="card-img-top" alt="Hình ảnh Đà Lạt">
+                <div class="card-body"><h5 class="card-title">Hà Nội - Đà Lạt</h5>
+                    <p class="card-text">Ngày: 19 - 20 Tháng 12 2024</p>
+                    <p class="card-text">Hãng: VietJet Air - Bamboo Airways</p>
+                    <p class="card-text">Giá: 2.921.990 VND</p></div>
+            </div>
+        </div> <!-- Chuyến bay 4 -->
+        <div class="col-md-3">
+            <div class="card"><img src="{{ airports[0].airport_image }}" class="card-img-top" alt="Hình ảnh Hà Nội">
+                <div class="card-body"><h5 class="card-title">TP HCM - Hà Nội</h5>
+                    <p class="card-text">Ngày: 17 - 18 Tháng 12 2024</p>
+                    <p class="card-text">Hãng: Vietravel Airlines</p>
+                    <p class="card-text">Giá: 2.791.800 VND</p></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

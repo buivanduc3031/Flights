@@ -22,8 +22,8 @@ class User(UserMixin, db.Model):
     username = Column(String(100), nullable=False, unique=True)
     password = Column(String(100), nullable=False)
     email = Column(String(255), nullable=False, unique=True)
-    dob = Column(String(255), nullable=False)
-    gender = Column(Boolean, nullable=False)
+    dob = Column(Date)
+    gender = Column(Boolean)
     avatar = Column(String(200),
                     default="https://res.cloudinary.com/dxxwcby8l/image/upload/v1690528735/cg6clgelp8zjwlehqsst.jpg")
     user_role = Column(SQLEnum(UserRole), default=UserRole.CUSTOMER)
@@ -40,6 +40,7 @@ class Payment(db.Model):
     payment_type = Column(Boolean, nullable=False)
     payment_date = Column(Date, nullable=False)
     payment_cost = Column(Float, nullable=False)
+    user_id = Column(Integer, ForeignKey(User.id), nullable=False)
 
 
 class Cancellation(db.Model):
@@ -47,11 +48,13 @@ class Cancellation(db.Model):
     refund = Column(Float, nullable=False)
     date = Column(Date, nullable=False)
     payment_id = Column(Integer, ForeignKey(Payment.payment_id), nullable=False)
+    user_id = Column(Integer, ForeignKey(User.id), nullable=False)
 
 class Airport(db.Model):
     airport_id = Column(Integer, primary_key=True, autoincrement=True)
     airport_name = Column(String(255), nullable=False)
     airport_address = Column(String(255), nullable=False)
+    airport_image = Column(String(255), nullable=False)
 
 
 class FlightRoute(db.Model):
@@ -68,6 +71,7 @@ class Flight(db.Model):
     f_dept_time = Column(DateTime, nullable=False)
     flight_arr_time = Column(DateTime, nullable=False)
     flight_duration = Column(Float)
+    flight_price = Column(Float)
     flight_route_id = Column(Integer, ForeignKey(FlightRoute.fr_id), nullable=False)
 
 
@@ -110,7 +114,10 @@ class Luggage(db.Model):
     user_id = Column(Integer, ForeignKey(User.id), nullable=False)
     flight_id = Column(Integer, ForeignKey(Flight.flight_id), nullable=False)
 
-
+class FlightSchedule(db.Model):
+    schedule_id = Column(Integer, primary_key=True, autoincrement=True)
+    flight_id = Column(Integer, ForeignKey(Flight.flight_id), nullable=False)
+    user_id = Column(Integer, ForeignKey(User.id), nullable=False)
 
 if __name__ == '__main__':
     with app.app_context():
