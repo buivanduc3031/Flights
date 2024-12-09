@@ -66,6 +66,16 @@ def logout_process():
     logout_user()
     return redirect('/login')
 
+@app.route("/login-admin", methods=[ 'post'])
+def login_admin_process():
+    if request.method.__eq__("POST"):
+        username = request.form.get('username')
+        password = request.form.get('password')
+        user = dao.auth_user(username=username, password=password, role= UserRole.ADMIN)
+        if user:
+            login_user(user)
+            return redirect('/admin')
+
 @login.user_loader
 def get_user_by_id(user_id):
     return dao.get_user_by_id(user_id)
@@ -73,5 +83,5 @@ def get_user_by_id(user_id):
 
 if __name__ == '__main__':
     with app.app_context():
-        # from app import admin
+        from app import admin
         app.run(debug=True)
