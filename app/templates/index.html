@@ -52,11 +52,39 @@
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label class="form-label">Hành khách</label>
-                    <select class="form-select" name="passenger_count">
-                        <option value="1">1 Người lớn</option>
-                        <option value="2">2 Người lớn</option>
-                        <option value="3">3 Người lớn</option>
-                    </select>
+                    <div class="custom-select">
+            <button class="select-button" id="select-button">Chọn số hành khách</button>
+            <div class="dropdown hidden">
+                <h2 class="dropdown-title">Số hành khách</h2>
+                <div class="guest-count">
+                    <div class="guest-type">
+                        <span>Người lớn</span>
+                        <div class="controls">
+                            <button class="btn decrease" onclick>-</button>
+                            <input type="number" value="1" min="0" class="number-input" id="adult-count">
+                            <button class="btn increase">+</button>
+                        </div>
+                    </div>
+                    <div class="guest-type">
+                        <span>Trẻ em</span>
+                        <div class="controls">
+                            <button class="btn decrease">-</button>
+                            <input type="number" value="0" min="0" class="number-input" id="child-count">
+                            <button class="btn increase">+</button>
+                        </div>
+                    </div>
+                    <div class="guest-type">
+                        <span>Em bé</span>
+                        <div class="controls">
+                            <button class="btn decrease">-</button>
+                            <input type="number" value="0" min="0" class="number-input" id="infant-count">
+                            <button class="btn increase">+</button>
+                        </div>
+                    </div>
+                </div>
+                <button class="confirm-button" onclick="confirmSelection()">Xong</button>
+            </div>
+        </div>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Hạng vé</label>

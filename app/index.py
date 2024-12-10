@@ -8,13 +8,13 @@ from app.models import UserRole
 
 @app.route("/")
 def index():
-    flights = dao.show_flights()
-    print(flights)
+    # flights = dao.show_flights()
+    # print(flights)
 
     airports = dao.load_airports()
 
 
-    return render_template('index.html', flights=flights, airports=airports)
+    return render_template('index.html', airports=airports)
 
 
 @app.route('/register', methods=['get', 'post'])
