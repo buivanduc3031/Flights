@@ -1,4 +1,6 @@
 import random
+
+from cloudinary.utils import unique
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, Enum as SQLEnum, Boolean, Date, DateTime
 from app import db, app
@@ -28,10 +30,9 @@ class User(UserMixin, db.Model):
                     default="https://res.cloudinary.com/dxxwcby8l/image/upload/v1690528735/cg6clgelp8zjwlehqsst.jpg")
     user_role = Column(SQLEnum(UserRole), default=UserRole.CUSTOMER)
 
-# class Staff(User):
-#     id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-#     hire_date = Column(Date, nullable=False)
-#     staff_salary = Column(Float, nullable=False)
+    def __str__(self):
+        return self.name
+
 
 
 class Payment(db.Model):
@@ -56,6 +57,9 @@ class Airport(db.Model):
     airport_address = Column(String(255), nullable=False)
     airport_image = Column(String(255), nullable=False)
 
+    def __str__(self):
+        return self.airport_name
+
 
 class FlightRoute(db.Model):
     fr_id = Column(Integer, primary_key=True, autoincrement=True)
@@ -64,6 +68,9 @@ class FlightRoute(db.Model):
     distance = Column(Float)
     description = Column(String(255))
     flights = relationship('Flight', backref='FlightRoute', lazy = True)
+
+    def __str__(self):
+        return self.fr_id.__str__()
 
 
 class Flight(db.Model):
@@ -74,11 +81,17 @@ class Flight(db.Model):
     flight_price = Column(Float)
     flight_route_id = Column(Integer, ForeignKey(FlightRoute.fr_id), nullable=False)
 
+    def __str__(self):
+        return self.flight_id.__str__()
+
 
 class Plane(db.Model):
     plane_id = Column(Integer, primary_key=True, autoincrement=True)
     plane_name = Column(String(255), nullable=False)
     seats = relationship('Seat', backref = 'Plane', lazy = True, cascade="all, delete")
+
+    def __str__(self):
+        return self.plane_name.__str__()
 
 
 class Company(db.Model):
@@ -89,7 +102,7 @@ class Company(db.Model):
 
 class Seat(db.Model):
     seat_id = Column(Integer, primary_key=True, autoincrement=True)
-    seat_number = Column(Integer, nullable=False)
+    seat_number = Column(Integer, nullable=False, unique = True)
     seat_class = Column(SQLEnum(SeatClass), default = SeatClass.ECONOMY)
     seat_status = Column(Boolean, nullable=False)
     plane_id = Column(Integer, ForeignKey(Plane.plane_id), nullable=False)
@@ -124,3 +137,12 @@ class FlightSchedule(db.Model):
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+
+        # u = User(name='admin', username='admin', password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
+        #          user_role=UserRole.ADMIN)
+        # db.session.add(u)
+        # db.session.commit()
+        staff = User(name='staff', username = 'staff', password = str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
+                    user_role = UserRole.STAFF_MANAGE, email = 'staff@gmail.com', dob = '2000-10-10', gender = 1)
+        db.session.add(staff)
+        db.session.commit()
