@@ -14,7 +14,7 @@ def index():
     airports = dao.load_airports()
 
 
-    return render_template('index.html', airports=airports)
+    return render_template('booking.html', airports=airports)
 
 
 @app.route('/register', methods=['get', 'post'])
