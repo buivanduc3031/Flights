@@ -139,10 +139,10 @@ if __name__ == '__main__':
         db.create_all()
 
         # u = User(name='admin', username='admin', password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
-        #          user_role=UserRole.ADMIN)
+        #          user_role=UserRole.ADMIN,email = 'staff@gmail.com', dob = '2000-10-10', gender = 1)
         # db.session.add(u)
         # db.session.commit()
         staff = User(name='staff', username = 'staff', password = str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
-                    user_role = UserRole.STAFF_MANAGE, email = 'staff@gmail.com', dob = '2000-10-10', gender = 1)
+                    user_role = UserRole.STAFF_MANAGE, email = 'staff1@gmail.com', dob = '2000-10-10', gender = 1)
         db.session.add(staff)
         db.session.commit()
