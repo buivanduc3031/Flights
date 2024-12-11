@@ -14,7 +14,7 @@ def index():
     airports = dao.load_airports()
 
 
-    return render_template('payment.html', airports=airports)
+    return render_template('payment_qr.html', airports=airports)
 
 
 @app.route('/register', methods=['get', 'post'])
