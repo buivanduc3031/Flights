@@ -7,7 +7,9 @@ from flask import render_template, request, redirect, session, jsonify
 import dao
 from app import app, login
 from flask_login import login_user, logout_user
-from app.models import UserRole, Flight, Airport, FlightRoute, Plane, EconomyCard
+from app.models import UserRole, Flight, Airport, FlightRoute, Plane, Seat, Booking
+from datetime import datetime
+from sqlalchemy import func
 
 
 @app.route("/")
@@ -88,48 +90,58 @@ def get_user_by_id(user_id):
 
 
 
-@app.route('/flight_booking', methods=['GET'])
+@app.route('/booking', methods=['GET'])
 def flights():
     # Lấy tất cả các chuyến bay và các thông tin liên quan
-    flights = db.session.query(Flight) \
-        .join(Plane) \
-        .join(FlightRoute, Flight.flight_route_id == FlightRoute.fr_id) \
-        .options(
-        selectinload(Flight.economy_cards),  # Sử dụng selectinload để tải trước các Economy Cards
-        selectinload(Flight.plane)  # Sử dụng selectinload để tải thông tin máy bay
+    airports = dao.load_airports()
+    # Truyền dữ liệu vào template
+    return render_template('booking.html',airports=airports)
+
+
+
+
+
+
+@app.route('/search', methods=['GET'])
+def search_flights():
+    # Capture form data from the request
+    departure = request.args.get('departure')
+    arrival = request.args.get('arrival')
+    departure_date = request.args.get('departure_date')
+    return_date = request.args.get('return_date')
+
+    adult_count = request.args.get('adult-count')
+    child_count = request.args.get('child-count')
+    infant_count = request.args.get('infant-count')
+
+    # Convert departure_date to a datetime object
+    departure_date_obj = datetime.strptime(departure_date, '%Y-%m-%d').date() if departure_date else None
+
+    # Query the Airport model to get the departure and arrival airports based on user input
+    departure_airport = Airport.query.filter_by(airport_name=departure).first()
+    arrival_airport = Airport.query.filter_by(airport_name=arrival).first()
+
+    # Check if airports were found
+    if not departure_airport or not arrival_airport:
+        # If no airports found, return an error message or redirect
+        return render_template('booking.html', airports=dao.load_airports(), error="Airport not found")
+
+    # Query FlightRoute model to get the flight routes based on departure and arrival airports
+    flight_routes = FlightRoute.query.filter(
+        FlightRoute.departure_airport_id == departure_airport.airport_id,
+        FlightRoute.arrival_airport_id == arrival_airport.airport_id
     ).all()
 
-    # Truyền dữ liệu vào template
-    return render_template('booking.html', flights=flights)
+    # Query Flight model based on the filtered routes and the departure date
+    flights = Flight.query.filter(
+        Flight.flight_route_id.in_([route.fr_id for route in flight_routes]),
+        func.date(Flight.f_dept_time) == departure_date_obj  # Compare only the date part of f_dept_time
+    ).all()
+
+    # Return the results to the template along with airports
+    return render_template('booking.html', flights=flights, airports=dao.load_airports())
 
 
-
-# @app.route('/search_flights', methods=['GET', 'POST'])
-# def search_flights():
-#     # Lấy các tham số lọc từ form
-#     flight_type = request.form.getlist('flight_type')  # Danh sách các loại chuyến bay
-#     dept_time = request.form.getlist('departure_time')  # Giờ cất cánh
-#     arr_time = request.form.getlist('arrival_time')  # Giờ hạ cánh
-#
-#     # Xây dựng câu truy vấn để lọc chuyến bay
-#     flights_query = Flight.query.join(FlightRoute).join(Airport,
-#                                                         Airport.airport_id == FlightRoute.departure_airport_id).filter()
-#
-#     if flight_type:
-#         flights_query = flights_query.filter(Flight.flight_type.in_(flight_type))
-#
-#     if dept_time:
-#         # Xử lý lọc giờ cất cánh (ví dụ: 06:00 - 12:00)
-#         flights_query = flights_query.filter(Flight.f_dept_time.between(dept_time[0], dept_time[1]))
-#
-#     if arr_time:
-#         # Xử lý lọc giờ hạ cánh
-#         flights_query = flights_query.filter(Flight.flight_arr_time.between(arr_time[0], arr_time[1]))
-#
-#     flights = flights_query.all()
-#
-#     # Trả về trang với kết quả chuyến bay
-#     return render_template('booking.html', flights=flights)
 
 
 if __name__ == '__main__':

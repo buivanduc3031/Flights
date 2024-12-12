@@ -1,3 +1,5 @@
+from setuptools._entry_points import render
+
 from app.models import User, Airport, FlightRoute, Flight, Company
 from app import app, db
 import hashlib
@@ -69,3 +71,29 @@ def show_flights():
         .join(Company, Company.com_id == FlightRoute.departure_airport_id) \
         .limit(10).all()
     return flights
+
+
+def search_flights(request):
+    # Lấy các giá trị từ form
+    departure = request.GET.get('departure')
+    arrival = request.GET.get('arrival')
+    departure_date = request.GET.get('departure_date')
+    return_date = request.GET.get('return_date')
+    flight_class = request.GET.get('class')
+
+    # Lọc chuyến bay theo điểm đi, điểm đến và ngày khởi hành
+    flights = Flight.objects.filter(
+        departure_airport__airport_name__icontains=departure,
+        arrival_airport__airport_name__icontains=arrival,
+        departure_time__gte=datetime.strptime(departure_date, '%Y-%m-%d')
+    )
+
+    # Nếu có ngày trở lại, lọc thêm theo ngày về
+    if return_date:
+        flights = flights.filter(return_time__gte=datetime.strptime(return_date, '%Y-%m-%d'))
+
+    # Lọc theo hạng vé nếu có
+    if flight_class:
+        flights = flights.filter(flight_class=flight_class)
+
+    return render(request, 'booking.html', {'flights': flights})

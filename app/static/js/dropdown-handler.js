@@ -29,7 +29,6 @@ document.querySelectorAll('.btn').forEach(button => {
 function confirmSelection() {
     // Cập nhật văn bản trên button "Chọn số hành khách"
     updateButtonText();
-
     // Ẩn dropdown sau khi nhấn "Xong"
     document.querySelector('.dropdown').classList.add('hidden');
 }
@@ -58,6 +57,7 @@ function updateButtonText() {
     document.getElementById('select-button').textContent = buttonText;
 }
 
+
 // Đảm bảo khi trang web load lần đầu, số lượng hành khách hiển thị đúng
 window.onload = function() {
     // Đặt giá trị mặc định cho input
@@ -68,3 +68,11 @@ window.onload = function() {
     // Cập nhật văn bản cho button khi trang được tải
     updateButtonText();
 }
+
+document.getElementById('departure').addEventListener('focus', function() {
+    this.value = '';  // Clear the field when focused
+});
+
+document.getElementById('arrival').addEventListener('focus', function() {
+    this.value = '';  // Clear the field when focused
+});
