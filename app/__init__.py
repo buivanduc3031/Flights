@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 import cloudinary
 
+
 app = Flask(__name__)
 app.secret_key = "KJGHJG^&*%&*^T&*(IGFG%ERFTGHCFHGFasdasIU"
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:%s@localhost/flightdb?charset=utf8mb4" % quote('aiconcha123')
@@ -19,3 +20,10 @@ cloudinary.config(
     api_secret="W_FvA2NSah3Jlv8cxhubvnw2mVM",  # Click 'View API Keys' above to copy your API secret
     secure=True
 )
+
+@app.template_filter('intcomma')
+def intcomma_filter(value):
+    # Trả về giá trị đã format với dấu phẩy
+    if value is None:
+        return value
+    return "{:,}".format(value)

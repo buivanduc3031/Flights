@@ -86,101 +86,74 @@
 
         <!-- Danh sách chuyến bay bên phải -->
         <div class="col-md-9">
+            {% for flight in flights %}
             <div class="card mb-3">
                 <div class="card-header bg-primary text-white">
-                    Viettravel Airlines
+                    {{ flight.plane.plane_name }}
                 </div>
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
                         <div class="time">
-                            <h6 class="mb-0 text-success">17:50</h6>
-                            <span class="text-muted">Sân bay Nội Bài</span>
+                            <h6 class="mb-0 text-success">{{ flight.f_dept_time.strftime('%H:%M') }}</h6>
+                            <span class="text-muted">{{ flight.flight_route.departure_airport.airport_name }}</span>
                         </div>
+
                         <div class="text-center">
-                            <h6 class="mb-0 text-info">Bay thẳng</h6>
+                            <h6 class="mb-0 text-info">{{ flight.flight_type.name }}</h6>
                             <div><i class="bi bi-arrow-right"></i></div>
-                            <span class="text-muted">1h 20m</span>
+                            <span class="text-muted">{{ flight.flight_duration }} giờ</span>
                         </div>
                         <div class="time">
-                            <h6 class="mb-0 text-success">17:50</h6>
-                            <span class="text-muted">Sân bay TSN</span>
+                            <h6 class="mb-0 text-success">{{ flight.flight_arr_time.strftime('%H:%M') }}</h6>
+                            <span class="text-muted">{{ flight.flight_route.arrival_airport.airport_name }}</span>
                         </div>
+
                         <div class="price text-danger">
-                            <span>1.003.860 VNĐ/khách</span>
+                            <span>{{ flight.flight_price | intcomma }} VNĐ/khách</span>
                         </div>
                         <div>
-                            <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#economyDetails">
+                            <button class="btn btn-primary" data-bs-toggle="collapse"
+                                    data-bs-target="#economyDetails-{{ flight.flight_id }}">
                                 Chọn <i class="bi bi-chevron-down"></i>
                             </button>
                         </div>
                     </div>
                 </div>
+
+                <!-- Economy Cards -->
+
             </div>
-
-            <div class="collapse" id="economyDetails">
+            <div class="collapse mt-2" id="economyDetails-{{ flight.flight_id }}">
                 <div class="row">
-                    <!-- Economy Card 1 -->
-                    <div class="col-md-4 mb-3">
-                        <div class="card border-success">
-                            <div class="card-body">
-                                <h5 class="card-title text-info">Economy</h5>
-                                <p class="card-text">Eco</p>
-                                <hr>
-                                <h6>Hành lý</h6>
-                                <ul class="list-unstyled">
-                                    <li><i class="bi bi-bag"></i> Hành lý ký gửi: <strong>Không</strong></li>
-                                    <li><i class="bi bi-bag-check"></i> Xách tay: <strong>1 kiện 07 kg</strong></li>
-                                </ul>
-                                <h6>Điều kiện vé</h6>
-                                <p class="price text-danger">2,026,600 đ</p>
-                                <p>Một chiều</p>
-                                <button class="btn btn-success">Đặt vé</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Economy Card 2 -->
+                    {% for card in flight.economy_cards %}
                     <div class="col-md-4 mb-3">
                         <div class="card border-info">
                             <div class="card-body">
-                                <h5 class="card-title text-info">Economy</h5>
-                                <p class="card-text">Eco</p>
+                                <h5 class="card-title text-info">{{ card.card_name }}</h5>
                                 <hr>
                                 <h6>Hành lý</h6>
                                 <ul class="list-unstyled">
-                                    <li><i class="bi bi-bag"></i> Hành lý ký gửi: <strong>Không</strong></li>
-                                    <li><i class="bi bi-bag-check"></i> Xách tay: <strong>1 kiện 07 kg</strong></li>
+                                    <li><i class="bi bi-bag-check"></i> Hành lý ký gửi: <strong>{{ 'Có' if
+                                        card.baggage_check_in else 'Không' }}</strong></li>
+                                    <li><i class="bi bi-bag"></i> Xách tay: <strong>{{ card.baggage_hand_luggage
+                                        }}</strong></li>
                                 </ul>
                                 <h6>Điều kiện vé</h6>
-                                <p class="price text-danger">2,026,600 đ</p>
-                                <p>Một chiều</p>
-                                <button class="btn btn-success">Đặt vé</button>
-                            </div>
-                        </div>
-                    </div>
+                                <p class="price text-danger">{{ card.price | intcomma }} VNĐ</p>
 
-                    <!-- Economy Card 3 -->
-                    <div class="col-md-4 mb-3">
-                        <div class="card border-warning">
-                            <div class="card-body">
-                                <h5 class="card-title text-info">Economy</h5>
-                                <p class="card-text">Eco</p>
-                                <hr>
-                                <h6>Hành lý</h6>
-                                <ul class="list-unstyled">
-                                    <li><i class="bi bi-bag"></i> Hành lý ký gửi: <strong>Không</strong></li>
-                                    <li><i class="bi bi-bag-check"></i> Xách tay: <strong>1 kiện 07 kg</strong></li>
-                                </ul>
-                                <h6>Điều kiện vé</h6>
-                                <p class="price text-danger">2,026,600 đ</p>
-                                <p>Một chiều</p>
-                                <button class="btn btn-success">Đặt vé</button>
+                                <input type="hidden" name="flight_id" value="{{ flight.flight_id }}">
+                                <input type="hidden" name="card_id" value="{{ card.id }}">
+                                <button type="submit" class="btn btn-success">Đặt vé</button>
+
                             </div>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
             </div>
+            {% endfor %}
         </div>
+
     </div>
 </div>
 

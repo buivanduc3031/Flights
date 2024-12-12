@@ -51,6 +51,7 @@ def get_airport_by_id(id):
 def load_flights():
     return Flight.query.all()
 
+
 def show_flights():
     # Truy vấn danh sách chuyến bay và thông tin liên quan
     flights = db.session.query(
