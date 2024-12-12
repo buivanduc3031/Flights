@@ -88,7 +88,7 @@ def get_user_by_id(user_id):
 
 
 
-@app.route('/flights', methods=['GET'])
+@app.route('/flight_booking', methods=['GET'])
 def flights():
     # Lấy tất cả các chuyến bay và các thông tin liên quan
     flights = db.session.query(Flight) \
@@ -104,32 +104,32 @@ def flights():
 
 
 
-@app.route('/search_flights', methods=['GET', 'POST'])
-def search_flights():
-    # Lấy các tham số lọc từ form
-    flight_type = request.form.getlist('flight_type')  # Danh sách các loại chuyến bay
-    dept_time = request.form.getlist('departure_time')  # Giờ cất cánh
-    arr_time = request.form.getlist('arrival_time')  # Giờ hạ cánh
-
-    # Xây dựng câu truy vấn để lọc chuyến bay
-    flights_query = Flight.query.join(FlightRoute).join(Airport,
-                                                        Airport.airport_id == FlightRoute.departure_airport_id).filter()
-
-    if flight_type:
-        flights_query = flights_query.filter(Flight.flight_type.in_(flight_type))
-
-    if dept_time:
-        # Xử lý lọc giờ cất cánh (ví dụ: 06:00 - 12:00)
-        flights_query = flights_query.filter(Flight.f_dept_time.between(dept_time[0], dept_time[1]))
-
-    if arr_time:
-        # Xử lý lọc giờ hạ cánh
-        flights_query = flights_query.filter(Flight.flight_arr_time.between(arr_time[0], arr_time[1]))
-
-    flights = flights_query.all()
-
-    # Trả về trang với kết quả chuyến bay
-    return render_template('booking.html', flights=flights)
+# @app.route('/search_flights', methods=['GET', 'POST'])
+# def search_flights():
+#     # Lấy các tham số lọc từ form
+#     flight_type = request.form.getlist('flight_type')  # Danh sách các loại chuyến bay
+#     dept_time = request.form.getlist('departure_time')  # Giờ cất cánh
+#     arr_time = request.form.getlist('arrival_time')  # Giờ hạ cánh
+#
+#     # Xây dựng câu truy vấn để lọc chuyến bay
+#     flights_query = Flight.query.join(FlightRoute).join(Airport,
+#                                                         Airport.airport_id == FlightRoute.departure_airport_id).filter()
+#
+#     if flight_type:
+#         flights_query = flights_query.filter(Flight.flight_type.in_(flight_type))
+#
+#     if dept_time:
+#         # Xử lý lọc giờ cất cánh (ví dụ: 06:00 - 12:00)
+#         flights_query = flights_query.filter(Flight.f_dept_time.between(dept_time[0], dept_time[1]))
+#
+#     if arr_time:
+#         # Xử lý lọc giờ hạ cánh
+#         flights_query = flights_query.filter(Flight.flight_arr_time.between(arr_time[0], arr_time[1]))
+#
+#     flights = flights_query.all()
+#
+#     # Trả về trang với kết quả chuyến bay
+#     return render_template('booking.html', flights=flights)
 
 
 if __name__ == '__main__':
