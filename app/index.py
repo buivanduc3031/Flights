@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import unicodedata
 from sqlalchemy.orm import selectinload
 
 from app import db
@@ -7,19 +8,30 @@ from flask import render_template, request, redirect, session, jsonify
 import dao
 from app import app, login
 from flask_login import login_user, logout_user
-from app.models import UserRole, Flight, Airport, FlightRoute, Plane, Seat, Booking
+from app.models import UserRole, Flight, Airport, FlightRoute, Plane, Seat
 from datetime import datetime
 from sqlalchemy import func
 
+def remove_accents(input_str):
+    return ''.join(
+        c for c in unicodedata.normalize('NFD', input_str)
+        if unicodedata.category(c) != 'Mn'
+    )
 
 @app.route("/")
 def index():
-    # flights = dao.show_flights()
-    # print(flights)
+    departure_name = request.args.get('departure', 'Ho Chi Minh')
+    departure_name = remove_accents(departure_name)
+    routes = dao.get_popular_routes(departure_name)
+
+    # print(departure_name)
+    cities = ["Hồ Chí Minh", "Hà Nội", "Đà Nẵng", "Singapore", "Bangkok", "Taipei", "Seoul", "Tokyo"]
 
     airports = dao.load_airports()
 
-    return render_template('index.html', airports=airports)
+    flights = dao.load_flights()
+
+    return render_template('index.html', airports=airports, routes=routes, cities= cities, flights=flights)
 
 
 @app.route('/register', methods=['get', 'post'])
@@ -108,37 +120,16 @@ def search_flights():
     departure = request.args.get('departure')
     arrival = request.args.get('arrival')
     departure_date = request.args.get('departure_date')
-    return_date = request.args.get('return_date')
 
-    adult_count = request.args.get('adult-count')
-    child_count = request.args.get('child-count')
-    infant_count = request.args.get('infant-count')
 
-    # Convert departure_date to a datetime object
-    departure_date_obj = datetime.strptime(departure_date, '%Y-%m-%d').date() if departure_date else None
+    # Call the dao function to search for flights
+    flights, error = dao.search_flights(departure, arrival, departure_date)
 
-    # Query the Airport model to get the departure and arrival airports based on user input
-    departure_airport = Airport.query.filter_by(airport_name=departure).first()
-    arrival_airport = Airport.query.filter_by(airport_name=arrival).first()
+    # If there's an error (e.g., airports not found), return to index with error
+    if error:
+        return render_template('booking.html', airports=dao.load_airports(), error=error)
 
-    # Check if airports were found
-    if not departure_airport or not arrival_airport:
-        # If no airports found, return an error message or redirect
-        return render_template('booking.html', airports=dao.load_airports(), error="Airport not found")
-
-    # Query FlightRoute model to get the flight routes based on departure and arrival airports
-    flight_routes = FlightRoute.query.filter(
-        FlightRoute.departure_airport_id == departure_airport.airport_id,
-        FlightRoute.arrival_airport_id == arrival_airport.airport_id
-    ).all()
-
-    # Query Flight model based on the filtered routes and the departure date
-    flights = Flight.query.filter(
-        Flight.flight_route_id.in_([route.fr_id for route in flight_routes]),
-        func.date(Flight.f_dept_time) == departure_date_obj  # Compare only the date part of f_dept_time
-    ).all()
-
-    # Return the results to the template along with airports
+    # Return the results to the template
     return render_template('booking.html', flights=flights, airports=dao.load_airports())
 
 

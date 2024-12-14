@@ -1,6 +1,7 @@
-from setuptools._entry_points import render
+from sqlalchemy import func
+from sqlalchemy.orm import aliased, selectinload
 
-from app.models import User, Airport, FlightRoute, Flight, Company
+from app.models import User, Airport, FlightRoute, Flight, Company, Plane, Seat
 from app import app, db
 import hashlib
 import cloudinary.uploader
@@ -72,28 +73,60 @@ def show_flights():
         .limit(10).all()
     return flights
 
+def get_popular_routes(departure_name=None):
 
-def search_flights(request):
-    # Lấy các giá trị từ form
-    departure = request.GET.get('departure')
-    arrival = request.GET.get('arrival')
-    departure_date = request.GET.get('departure_date')
-    return_date = request.GET.get('return_date')
-    flight_class = request.GET.get('class')
+    arrival_airport = db.aliased(Airport)
 
-    # Lọc chuyến bay theo điểm đi, điểm đến và ngày khởi hành
-    flights = Flight.objects.filter(
-        departure_airport__airport_name__icontains=departure,
-        arrival_airport__airport_name__icontains=arrival,
-        departure_time__gte=datetime.strptime(departure_date, '%Y-%m-%d')
+    query = db.session.query(
+        FlightRoute.fr_id,
+        Airport.airport_name.label('departure'),
+        arrival_airport.airport_name.label('arrival'),
+        arrival_airport.airport_image.label('image'),
+        FlightRoute.description
+    ).join(
+        Airport, FlightRoute.departure_airport_id == Airport.airport_id
+    ).join(
+        arrival_airport, FlightRoute.arrival_airport_id == arrival_airport.airport_id
     )
 
-    # Nếu có ngày trở lại, lọc thêm theo ngày về
-    if return_date:
-        flights = flights.filter(return_time__gte=datetime.strptime(return_date, '%Y-%m-%d'))
+    if departure_name:
+        query = query.filter(Airport.airport_address.like(f"%{departure_name}%"))
+    return query.all()
 
-    # Lọc theo hạng vé nếu có
-    if flight_class:
-        flights = flights.filter(flight_class=flight_class)
+def load_flights():
 
-    return render(request, 'booking.html', {'flights': flights})
+    flights = db.session.query(Flight) \
+        .join(Plane) \
+        .join(FlightRoute, Flight.flight_route_id == FlightRoute.fr_id) \
+        .options(
+        selectinload(Flight.plane)  # Sử dụng selectinload để tải thông tin máy bay
+    ).all()
+
+    return flights
+
+def search_flights(departure, arrival, departure_date):
+    # Query the Airport model for departure and arrival airports
+    departure_airport = Airport.query.filter_by(airport_name=departure).first()
+    arrival_airport = Airport.query.filter_by(airport_name=arrival).first()
+
+    if not departure_airport or not arrival_airport:
+        return None, "Airport not found"
+
+    # Query FlightRoute model for matching routes
+    flight_routes = FlightRoute.query.filter(
+        FlightRoute.departure_airport_id == departure_airport.airport_id,
+        FlightRoute.arrival_airport_id == arrival_airport.airport_id
+    ).all()
+
+    if not flight_routes:
+        return [], None  # No matching routes
+
+    # Query Flight model for flights on the specified date
+    departure_date_obj = datetime.strptime(departure_date, '%Y-%m-%d').date() if departure_date else None
+    flights = Flight.query.filter(
+        Flight.flight_route_id.in_([route.fr_id for route in flight_routes]),
+        func.date(Flight.f_dept_time) == departure_date_obj
+    ).all()
+
+    return flights, None
+
