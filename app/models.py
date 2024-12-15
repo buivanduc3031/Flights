@@ -195,148 +195,148 @@ class IntermediateAirport(db.Model):
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()  # Tạo lại các bảng
+        # db.create_all()  # Tạo lại các bảng
 
-        # # Add Users
-        # users = [
-        #     User(name='admin', username='admin', password=hashlib.md5('123456'.encode('utf-8')).hexdigest(),
-        #          user_role=UserRole.ADMIN, email='admin@gmail.com', dob=date(2000, 10, 10), gender=True),
-        #     User(name='staff1', username='staff1', password=hashlib.md5('staff123'.encode('utf-8')).hexdigest(),
-        #          user_role=UserRole.STAFF_MANAGE, email='staff1@gmail.com', dob=date(1990, 5, 15), gender=True),
-        #     User(name='staff2', username='staff2', password=hashlib.md5('staff123'.encode('utf-8')).hexdigest(),
-        #          user_role=UserRole.STAFF_TICKET, email='staff2@gmail.com', dob=date(1992, 7, 12), gender=False),
-        #     User(name='customer1', username='customer1',
-        #          password=hashlib.md5('customer123'.encode('utf-8')).hexdigest(),
-        #          user_role=UserRole.CUSTOMER, email='customer1@gmail.com', dob=date(1995, 8, 10), gender=False),
-        #     User(name='customer2', username='customer2',
-        #          password=hashlib.md5('customer123'.encode('utf-8')).hexdigest(),
-        #          user_role=UserRole.CUSTOMER, email='customer2@gmail.com', dob=date(1998, 3, 22), gender=True),
-        # ]
-        # db.session.add_all(users)
-        # db.session.commit()
-        #
-        # # Add Airports
-        # airports = [
-        #     Airport(airport_name='Noi Bai International Airport', airport_address='Hanoi, Vietnam',
-        #             airport_image='https://example.com/noi_bai.jpg'),
-        #     Airport(airport_name='Tan Son Nhat International Airport', airport_address='Ho Chi Minh, Vietnam',
-        #             airport_image='https://example.com/tan_son_nhat.jpg'),
-        #     Airport(airport_name='Da Nang International Airport', airport_address='Da Nang, Vietnam',
-        #             airport_image='https://example.com/da_nang.jpg'),
-        #     Airport(airport_name='Incheon International Airport', airport_address='Seoul, South Korea',
-        #             airport_image='https://example.com/incheon.jpg'),
-        #     Airport(airport_name='Changi Airport', airport_address='Singapore',
-        #             airport_image='https://example.com/changi.jpg')
-        # ]
-        # db.session.add_all(airports)
-        # db.session.commit()
-        #
-        # # Add Companies
-        # companies = [
-        #     Company(com_name='Vietnam Airlines', com_country='Vietnam'),
-        #     Company(com_name='Korean Air', com_country='South Korea'),
-        #     Company(com_name='Singapore Airlines', com_country='Singapore'),
-        #     Company(com_name='Bamboo Airways', com_country='Vietnam'),
-        #     Company(com_name='VietJet Air', com_country='Vietnam')
-        # ]
-        # db.session.add_all(companies)
-        # db.session.commit()
-        #
-        # # Add Planes
-        # planes = [
-        #     Plane(plane_name='Airbus A321', total_seat=200, company_id=1),
-        #     Plane(plane_name='Boeing 787', total_seat=250, company_id=2),
-        #     Plane(plane_name='Airbus A350', total_seat=300, company_id=3),
-        #     Plane(plane_name='Boeing 737', total_seat=180, company_id=4),
-        #     Plane(plane_name='Embraer 190', total_seat=100, company_id=5)
-        # ]
-        # db.session.add_all(planes)
-        # db.session.commit()
-        #
-        # # Add Seats
-        # seat1 = Seat(seat_number=1, seat_class=SeatClass.ECONOMY, seat_status=False, plane_id=1)
-        # seat2 = Seat(seat_number=2, seat_class=SeatClass.ECONOMY, seat_status=False, plane_id=1)
-        # seat3 = Seat(seat_number=3, seat_class=SeatClass.ECONOMY, seat_status=False, plane_id=1)
-        # seat4 = Seat(seat_number=4, seat_class=SeatClass.ECONOMY, seat_status=True, plane_id=1)
-        # seat5 = Seat(seat_number=5, seat_class=SeatClass.ECONOMY, seat_status=True, plane_id=1)
-        # seat6 = Seat(seat_number=6, seat_class=SeatClass.ECONOMY, seat_status=True, plane_id=1)
-        # seat7 = Seat(seat_number=7, seat_class=SeatClass.ECONOMY, seat_status=False, plane_id=1)
-        # seat8 = Seat(seat_number=8, seat_class=SeatClass.BUSINESS, seat_status=True, plane_id=1)
-        # seat9 = Seat(seat_number=9, seat_class=SeatClass.BUSINESS, seat_status=False, plane_id=1)
-        # seat10 = Seat(seat_number=10, seat_class=SeatClass.BUSINESS, seat_status=False, plane_id=1)
-        #
-        # seat11 = Seat(seat_number=1, seat_class=SeatClass.ECONOMY, seat_status=False, plane_id=2)
-        # seat12 = Seat(seat_number=2, seat_class=SeatClass.ECONOMY, seat_status=False, plane_id=2)
-        # seat13 = Seat(seat_number=3, seat_class=SeatClass.ECONOMY, seat_status=False, plane_id=2)
-        # seat14 = Seat(seat_number=4, seat_class=SeatClass.ECONOMY, seat_status=True, plane_id=2)
-        # seat15 = Seat(seat_number=5, seat_class=SeatClass.ECONOMY, seat_status=True, plane_id=2)
-        # seat16 = Seat(seat_number=6, seat_class=SeatClass.ECONOMY, seat_status=True, plane_id=2)
-        # seat17 = Seat(seat_number=7, seat_class=SeatClass.ECONOMY, seat_status=False, plane_id=2)
-        # seat18 = Seat(seat_number=8, seat_class=SeatClass.BUSINESS, seat_status=True, plane_id=2)
-        # seat19 = Seat(seat_number=9, seat_class=SeatClass.BUSINESS, seat_status=True, plane_id=2)
-        # seat20 = Seat(seat_number=10, seat_class=SeatClass.BUSINESS, seat_status=True, plane_id=2)
-        #
-        # db.session.add_all(
-        #     [seat1, seat2, seat3, seat4, seat5, seat6, seat7, seat8, seat9, seat10, seat11, seat12, seat13, seat14,
-        #      seat15, seat16, seat17, seat18, seat19, seat20])
-        # db.session.commit()
-        #
-        # # Add Flight Routes
-        # routes = [
-        #     FlightRoute(departure_airport_id=1, arrival_airport_id=2, distance=1150.0, description='Hanoi to HCM City'),
-        #     FlightRoute(departure_airport_id=1, arrival_airport_id=3, distance=764.0, description='Hanoi to Da Nang'),
-        #     FlightRoute(departure_airport_id=3, arrival_airport_id=2, distance=964.0,
-        #                 description='Da Nang to HCM City'),
-        #     FlightRoute(departure_airport_id=4, arrival_airport_id=1, distance=2740.0, description='Seoul to Hanoi'),
-        #     FlightRoute(departure_airport_id=5, arrival_airport_id=1, distance=2224.0, description='Singapore to Hanoi')
-        # ]
-        # db.session.add_all(routes)
-        # db.session.commit()
-        #
-        # # Add Flights
-        # flights = [
-        #     Flight(f_dept_time=datetime(2024, 12, 15, 6, 0), flight_arr_time=datetime(2024, 12, 15, 8, 0),
-        #            flight_duration=2.0, flight_price=150.0, flight_type=FlightType.DIRECT, flight_route_id=1,
-        #            plane_id=1),
-        #     Flight(f_dept_time=datetime(2024, 12, 16, 7, 0), flight_arr_time=datetime(2024, 12, 16, 8, 30),
-        #            flight_duration=1.5, flight_price=120.0, flight_type=FlightType.DIRECT, flight_route_id=2,
-        #            plane_id=2),
-        #     Flight(f_dept_time=datetime(2024, 12, 17, 9, 0), flight_arr_time=datetime(2024, 12, 17, 12, 0),
-        #            flight_duration=3.0, flight_price=200.0, flight_type=FlightType.ONE_STOP, flight_route_id=3,
-        #            plane_id=3),
-        #     Flight(f_dept_time=datetime(2024, 12, 18, 10, 0), flight_arr_time=datetime(2024, 12, 18, 16, 0),
-        #            flight_duration=6.0, flight_price=400.0, flight_type=FlightType.DIRECT, flight_route_id=4,
-        #            plane_id=4),
-        #     Flight(f_dept_time=datetime(2024, 12, 19, 11, 0), flight_arr_time=datetime(2024, 12, 19, 15, 0),
-        #            flight_duration=4.0, flight_price=350.0, flight_type=FlightType.MULTIPLE_STOP, flight_route_id=5,
-        #            plane_id=5)
-        # ]
-        # db.session.add_all(flights)
-        # db.session.commit()
-        #
-        # # Add Intermediate Airports
-        # intermediates = [
-        #     IntermediateAirport(flight_id=3, airport_id=3, stopover_duration=45, stop_order=1),
-        #     IntermediateAirport(flight_id=5, airport_id=4, stopover_duration=60, stop_order=1),
-        #     IntermediateAirport(flight_id=5, airport_id=3, stopover_duration=30, stop_order=2)
-        # ]
-        # db.session.add_all(intermediates)
-        # db.session.commit()
-        #
-        # # Add Tickets
-        # tickets = [
-        #     Ticket(issue_date=date.today(), ticket_price=150.0, ticket_status=True, ticket_gate=1, user_id=4,
-        #            flight_id=1, seat_id=1),
-        #     Ticket(issue_date=date.today(), ticket_price=120.0, ticket_status=True, ticket_gate=2, user_id=4,
-        #            flight_id=2, seat_id=2),
-        #     Ticket(issue_date=date.today(), ticket_price=200.0, ticket_status=True, ticket_gate=3, user_id=5,
-        #            flight_id=3, seat_id=3),
-        #     Ticket(issue_date=date.today(), ticket_price=400.0, ticket_status=True, ticket_gate=4, user_id=5,
-        #            flight_id=4, seat_id=4),
-        #     Ticket(issue_date=date.today(), ticket_price=350.0, ticket_status=True, ticket_gate=5, user_id=4,
-        #            flight_id=5, seat_id=5)
-        # ]
-        # db.session.add_all(tickets)
-        # db.session.commit()
-        #
-        # print("Data added successfully!")
+        # Add Users
+        users = [
+            User(name='admin', username='admin', password=hashlib.md5('123456'.encode('utf-8')).hexdigest(),
+                 user_role=UserRole.ADMIN, email='admin@gmail.com', dob=date(2000, 10, 10), gender=True),
+            User(name='staff1', username='staff1', password=hashlib.md5('staff123'.encode('utf-8')).hexdigest(),
+                 user_role=UserRole.STAFF_MANAGE, email='staff1@gmail.com', dob=date(1990, 5, 15), gender=True),
+            User(name='staff2', username='staff2', password=hashlib.md5('staff123'.encode('utf-8')).hexdigest(),
+                 user_role=UserRole.STAFF_TICKET, email='staff2@gmail.com', dob=date(1992, 7, 12), gender=False),
+            User(name='customer1', username='customer1',
+                 password=hashlib.md5('customer123'.encode('utf-8')).hexdigest(),
+                 user_role=UserRole.CUSTOMER, email='customer1@gmail.com', dob=date(1995, 8, 10), gender=False),
+            User(name='customer2', username='customer2',
+                 password=hashlib.md5('customer123'.encode('utf-8')).hexdigest(),
+                 user_role=UserRole.CUSTOMER, email='customer2@gmail.com', dob=date(1998, 3, 22), gender=True),
+        ]
+        db.session.add_all(users)
+        db.session.commit()
+
+        # Add Airports
+        airports = [
+            Airport(airport_name='Noi Bai International Airport', airport_address='Hanoi, Vietnam',
+                    airport_image='https://example.com/noi_bai.jpg'),
+            Airport(airport_name='Tan Son Nhat International Airport', airport_address='Ho Chi Minh, Vietnam',
+                    airport_image='https://example.com/tan_son_nhat.jpg'),
+            Airport(airport_name='Da Nang International Airport', airport_address='Da Nang, Vietnam',
+                    airport_image='https://example.com/da_nang.jpg'),
+            Airport(airport_name='Incheon International Airport', airport_address='Seoul, South Korea',
+                    airport_image='https://example.com/incheon.jpg'),
+            Airport(airport_name='Changi Airport', airport_address='Singapore',
+                    airport_image='https://example.com/changi.jpg')
+        ]
+        db.session.add_all(airports)
+        db.session.commit()
+
+        # Add Companies
+        companies = [
+            Company(com_name='Vietnam Airlines', com_country='Vietnam'),
+            Company(com_name='Korean Air', com_country='South Korea'),
+            Company(com_name='Singapore Airlines', com_country='Singapore'),
+            Company(com_name='Bamboo Airways', com_country='Vietnam'),
+            Company(com_name='VietJet Air', com_country='Vietnam')
+        ]
+        db.session.add_all(companies)
+        db.session.commit()
+
+        # Add Planes
+        planes = [
+            Plane(plane_name='Airbus A321', total_seat=200, company_id=1),
+            Plane(plane_name='Boeing 787', total_seat=250, company_id=2),
+            Plane(plane_name='Airbus A350', total_seat=300, company_id=3),
+            Plane(plane_name='Boeing 737', total_seat=180, company_id=4),
+            Plane(plane_name='Embraer 190', total_seat=100, company_id=5)
+        ]
+        db.session.add_all(planes)
+        db.session.commit()
+
+        # Add Seats
+        seat1 = Seat(seat_number=1, seat_class=SeatClass.ECONOMY, seat_status=False, plane_id=1)
+        seat2 = Seat(seat_number=2, seat_class=SeatClass.ECONOMY, seat_status=False, plane_id=1)
+        seat3 = Seat(seat_number=3, seat_class=SeatClass.ECONOMY, seat_status=False, plane_id=1)
+        seat4 = Seat(seat_number=4, seat_class=SeatClass.ECONOMY, seat_status=True, plane_id=1)
+        seat5 = Seat(seat_number=5, seat_class=SeatClass.ECONOMY, seat_status=True, plane_id=1)
+        seat6 = Seat(seat_number=6, seat_class=SeatClass.ECONOMY, seat_status=True, plane_id=1)
+        seat7 = Seat(seat_number=7, seat_class=SeatClass.ECONOMY, seat_status=False, plane_id=1)
+        seat8 = Seat(seat_number=8, seat_class=SeatClass.BUSINESS, seat_status=True, plane_id=1)
+        seat9 = Seat(seat_number=9, seat_class=SeatClass.BUSINESS, seat_status=False, plane_id=1)
+        seat10 = Seat(seat_number=10, seat_class=SeatClass.BUSINESS, seat_status=False, plane_id=1)
+
+        seat11 = Seat(seat_number=1, seat_class=SeatClass.ECONOMY, seat_status=False, plane_id=2)
+        seat12 = Seat(seat_number=2, seat_class=SeatClass.ECONOMY, seat_status=False, plane_id=2)
+        seat13 = Seat(seat_number=3, seat_class=SeatClass.ECONOMY, seat_status=False, plane_id=2)
+        seat14 = Seat(seat_number=4, seat_class=SeatClass.ECONOMY, seat_status=True, plane_id=2)
+        seat15 = Seat(seat_number=5, seat_class=SeatClass.ECONOMY, seat_status=True, plane_id=2)
+        seat16 = Seat(seat_number=6, seat_class=SeatClass.ECONOMY, seat_status=True, plane_id=2)
+        seat17 = Seat(seat_number=7, seat_class=SeatClass.ECONOMY, seat_status=False, plane_id=2)
+        seat18 = Seat(seat_number=8, seat_class=SeatClass.BUSINESS, seat_status=True, plane_id=2)
+        seat19 = Seat(seat_number=9, seat_class=SeatClass.BUSINESS, seat_status=True, plane_id=2)
+        seat20 = Seat(seat_number=10, seat_class=SeatClass.BUSINESS, seat_status=True, plane_id=2)
+
+        db.session.add_all(
+            [seat1, seat2, seat3, seat4, seat5, seat6, seat7, seat8, seat9, seat10, seat11, seat12, seat13, seat14,
+             seat15, seat16, seat17, seat18, seat19, seat20])
+        db.session.commit()
+
+        # Add Flight Routes
+        routes = [
+            FlightRoute(departure_airport_id=1, arrival_airport_id=2, distance=1150.0, description='Hanoi to HCM City'),
+            FlightRoute(departure_airport_id=1, arrival_airport_id=3, distance=764.0, description='Hanoi to Da Nang'),
+            FlightRoute(departure_airport_id=3, arrival_airport_id=2, distance=964.0,
+                        description='Da Nang to HCM City'),
+            FlightRoute(departure_airport_id=4, arrival_airport_id=1, distance=2740.0, description='Seoul to Hanoi'),
+            FlightRoute(departure_airport_id=5, arrival_airport_id=1, distance=2224.0, description='Singapore to Hanoi')
+        ]
+        db.session.add_all(routes)
+        db.session.commit()
+
+        # Add Flights
+        flights = [
+            Flight(f_dept_time=datetime(2024, 12, 15, 6, 0), flight_arr_time=datetime(2024, 12, 15, 8, 0),
+                   flight_duration=2.0, flight_price=150.0, flight_type=FlightType.DIRECT, flight_route_id=1,
+                   plane_id=1),
+            Flight(f_dept_time=datetime(2024, 12, 16, 7, 0), flight_arr_time=datetime(2024, 12, 16, 8, 30),
+                   flight_duration=1.5, flight_price=120.0, flight_type=FlightType.DIRECT, flight_route_id=2,
+                   plane_id=2),
+            Flight(f_dept_time=datetime(2024, 12, 17, 9, 0), flight_arr_time=datetime(2024, 12, 17, 12, 0),
+                   flight_duration=3.0, flight_price=200.0, flight_type=FlightType.ONE_STOP, flight_route_id=3,
+                   plane_id=3),
+            Flight(f_dept_time=datetime(2024, 12, 18, 10, 0), flight_arr_time=datetime(2024, 12, 18, 16, 0),
+                   flight_duration=6.0, flight_price=400.0, flight_type=FlightType.DIRECT, flight_route_id=4,
+                   plane_id=4),
+            Flight(f_dept_time=datetime(2024, 12, 19, 11, 0), flight_arr_time=datetime(2024, 12, 19, 15, 0),
+                   flight_duration=4.0, flight_price=350.0, flight_type=FlightType.MULTIPLE_STOP, flight_route_id=5,
+                   plane_id=5)
+        ]
+        db.session.add_all(flights)
+        db.session.commit()
+
+        # Add Intermediate Airports
+        intermediates = [
+            IntermediateAirport(flight_id=3, airport_id=3, stopover_duration=45, stop_order=1),
+            IntermediateAirport(flight_id=5, airport_id=4, stopover_duration=60, stop_order=1),
+            IntermediateAirport(flight_id=5, airport_id=3, stopover_duration=30, stop_order=2)
+        ]
+        db.session.add_all(intermediates)
+        db.session.commit()
+
+        # Add Tickets
+        tickets = [
+            Ticket(issue_date=date.today(), ticket_price=150.0, ticket_status=True, ticket_gate=1, user_id=4,
+                   flight_id=1, seat_id=1),
+            Ticket(issue_date=date.today(), ticket_price=120.0, ticket_status=True, ticket_gate=2, user_id=4,
+                   flight_id=2, seat_id=2),
+            Ticket(issue_date=date.today(), ticket_price=200.0, ticket_status=True, ticket_gate=3, user_id=5,
+                   flight_id=3, seat_id=3),
+            Ticket(issue_date=date.today(), ticket_price=400.0, ticket_status=True, ticket_gate=4, user_id=5,
+                   flight_id=4, seat_id=4),
+            Ticket(issue_date=date.today(), ticket_price=350.0, ticket_status=True, ticket_gate=5, user_id=4,
+                   flight_id=5, seat_id=5)
+        ]
+        db.session.add_all(tickets)
+        db.session.commit()
+
+        print("Data added successfully!")

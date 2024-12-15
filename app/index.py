@@ -5,7 +5,7 @@ from sqlalchemy.orm import selectinload
 
 from app import db
 from flask import render_template, request, redirect, session, jsonify
-import dao
+import dao, utils
 from app import app, login
 from flask_login import login_user, logout_user
 from app.models import UserRole, Flight, Airport, FlightRoute, Plane, Seat
@@ -131,8 +131,41 @@ def search_flights():
     return render_template('booking.html', flights=flights, airports=dao.load_airports())
 
 
+@app.route("/api/carts", methods=['post'])
+def add_to_cart():
+    cart = session.get('cart')
 
+
+    if not cart:
+        cart = {}
+        print(request.json)
+        id = str(request.json.get('id'))
+        flight_number = request.json.get('flight_number')
+        departure = request.json.get('departure')
+        arrival = request.json.get('arrival')
+        price = request.json.get('price')
+    if id in cart:
+        cart[id]['quantity'] += 1
+    else:
+        cart[id] = {"id": id, "flight_number": flight_number, "departure": departure,
+                    "arrival": arrival, "price": price, "quantity": 1}
+    session['cart'] = cart
+    print(session['cart'])
+
+    return jsonify(utils.cart_stats(cart))
+
+@app.route("/cart")
+def cart_view():
+    return render_template('cart.html')
+
+@app.context_processor
+def common_response_data():
+    return {
+        # 'categories': dao.load_categories(),
+        'cart_stats': utils.cart_stats(session.get('cart'))
+    }
 
 if __name__ == '__main__':
     with app.app_context():
+        from app import admin
         app.run(debug=True)

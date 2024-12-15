@@ -1,7 +1,7 @@
 from app import db, app
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
-from app.models import User, UserRole, Company, Flight, FlightRoute, Airport, Plane, Ticket, Luggage, Cancellation, Payment, Seat, FlightSchedule
+from app.models import User, UserRole, Company, Flight, FlightRoute, Airport, Plane, Ticket, Luggage, Cancellation, Payment, Seat, FlightSchedule, IntermediateAirport
 from flask_login import current_user, logout_user
 from flask_admin import BaseView, expose
 from flask import redirect, render_template, url_for
@@ -35,8 +35,8 @@ class TicketAdminView(AuthenticatedView):
     column_filters = ['ticket_id']
     can_view_details = True
 
-    column_list = ['ticket_id', 'issue_date', 'ticket_place', 'ticket_price', 'ticket_status', 'ticket_gate', 'user_id', 'flight_id' ]
-    form_columns = ['issue_date', 'ticket_place', 'ticket_price', 'ticket_status', 'ticket_gate', 'user_id', 'flight_id' ]
+    column_list = ['ticket_id', 'issue_date', 'ticket_price', 'ticket_status', 'ticket_gate', 'user_id', 'flight_id' ]
+    form_columns = ['issue_date', 'ticket_price', 'ticket_status', 'ticket_gate', 'user_id', 'flight_id' ]
 
 class LuggageAdminView(AuthenticatedView):
     column_list = ['luggage_id',  'luggage_name', 'weight', 'user_id', 'flight_id']
@@ -50,7 +50,9 @@ class FlightScheduleAdminView(AuthenticatedView):
 class PlaneAdminView(AuthenticatedView):
     column_list = ['plane_id', 'plane_name']
 
-
+class IntermediateAirportAdminView(AuthenticatedView):
+    column_list = ['intermediate_id', 'flight_id', 'airport_id', 'stopover_duration', 'stop_order']
+    form_columns = ['flight_id', 'airport_id', 'stopover_duration', 'stop_order']
 
 
 
@@ -92,6 +94,7 @@ admin.add_view(AuthenticatedView(Payment, db.session))
 admin.add_view(AuthenticatedView(Seat, db.session))
 admin.add_view(FlightScheduleAdminView(FlightSchedule, db.session))
 admin.add_view(AuthenticatedView(Company, db.session))
+admin.add_view(IntermediateAirportAdminView(IntermediateAirport, db.session))
 admin.add_view(StatsView(name = 'Thống kê báo cáo'))
 admin.add_view(LogoutView(name = 'Đăng xuất'))
 
