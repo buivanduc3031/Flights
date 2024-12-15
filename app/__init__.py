@@ -3,11 +3,12 @@ from urllib.parse import quote
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 import cloudinary
+from unidecode import unidecode
 
 
 app = Flask(__name__)
 app.secret_key = "KJGHJG^&*%&*^T&*(IGFG%ERFTGHCFHGFasdasIU"
-app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:%s@localhost/flightdb?charset=utf8mb4" % quote('admin123')
+app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:%s@localhost/flightdb?charset=utf8mb4" % quote('aiconcha123')
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 app.config["PAGE_SIZE"] = 4
 
@@ -27,3 +28,11 @@ def intcomma_filter(value):
     if value is None:
         return value
     return "{:,}".format(value)
+
+# Định nghĩa bộ lọc remove_accents
+@app.template_filter('remove_accents')
+def remove_accents_filter(s):
+    return unidecode(s)
+
+# Đăng ký filter với Jinja2
+app.jinja_env.filters['remove_accents'] = remove_accents_filter

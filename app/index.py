@@ -20,18 +20,23 @@ def remove_accents(input_str):
 
 @app.route("/")
 def index():
+    # Lấy tên thành phố từ query string hoặc mặc định là "Ho Chi Minh"
     departure_name = request.args.get('departure', 'Ho Chi Minh')
-    departure_name = remove_accents(departure_name)
+    departure_name = remove_accents(departure_name)  # Xử lý bỏ dấu
+
+    # Lấy các tuyến bay dựa trên thành phố xuất phát
     routes = dao.get_popular_routes(departure_name)
 
-    # print(departure_name)
+    # Danh sách các thành phố phổ biến
     cities = ["Hồ Chí Minh", "Hà Nội", "Đà Nẵng", "Singapore", "Bangkok", "Taipei", "Seoul", "Tokyo"]
 
+    # Truy vấn dữ liệu sân bay và chuyến bay (nếu cần)
     airports = dao.load_airports()
-
     flights = dao.load_flights()
 
-    return render_template('index.html', airports=airports, routes=routes, cities= cities, flights=flights)
+    # Trả về giao diện cùng dữ liệu
+    return render_template('index.html', airports=airports, routes=routes, cities=cities, flights=flights, departure_name=departure_name)
+
 
 
 @app.route('/register', methods=['get', 'post'])

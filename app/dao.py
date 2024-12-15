@@ -73,10 +73,12 @@ def show_flights():
         .limit(10).all()
     return flights
 
-def get_popular_routes(departure_name=None):
 
+def get_popular_routes(departure_name=None):
+    # Alias cho bảng airport
     arrival_airport = db.aliased(Airport)
 
+    # Truy vấn cơ bản
     query = db.session.query(
         FlightRoute.fr_id,
         Airport.airport_name.label('departure'),
@@ -89,9 +91,12 @@ def get_popular_routes(departure_name=None):
         arrival_airport, FlightRoute.arrival_airport_id == arrival_airport.airport_id
     )
 
+    # Lọc theo tên sân bay nếu `departure_name` được cung cấp
     if departure_name:
-        query = query.filter(Airport.airport_address.like(f"%{departure_name}%"))
+        query = query.filter(Airport.airport_address.ilike(f"%{departure_name}%"))
+
     return query.all()
+
 
 def load_flights():
 

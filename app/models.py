@@ -195,7 +195,7 @@ class IntermediateAirport(db.Model):
 
 if __name__ == '__main__':
     with app.app_context():
-        # db.create_all()  # Tạo lại các bảng
+        db.create_all()  # Tạo lại các bảng
 
         # Add Users
         users = [
