@@ -112,8 +112,6 @@ def flights():
 
 
 
-
-
 @app.route('/search', methods=['GET'])
 def search_flights():
     # Capture form data from the request
