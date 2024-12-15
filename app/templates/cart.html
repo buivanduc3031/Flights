@@ -1,0 +1,26 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+
+{% if flights %}
+<div class="row"> {% for f in flights %}
+    <div class="col-md-3 col-12 p-2">
+        <div class="card"><img class="card-img-top" src="{{ f.image }}" alt="Card image">
+            <div class="card-body"><h4 class="card-title">{{ f.flight_number }}</h4>
+                <p class="card-text">{{ f.departure }} - {{ f.arrival }}</p>
+                <p class="card-text">{{ f.price }} VNĐ</p> <a href="#" class="btn btn-primary">Xem chi tiết</a>
+                <button class="btn btn-danger booking"
+                        onclick="add_to_cart('{{f.id}}', '{{ f.flight_number }}', '{{ f.departure }}', '{{ f.arrival }}', {{ f.price }})">
+                    Đặt chuyến bay
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info mt-1">Không có chuyến bay nào.</div>
+{% endif %}
+
+
+{% endblock %}
