@@ -107,7 +107,7 @@
     {% for flight in flights %}
     <div class="card mb-3 mt-5">
         <div class="card-header bg-primary text-white">
-            {{ flight.plane.plane_name }}
+            {{ flight.plane.company.com_name }}
         </div>
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
@@ -156,7 +156,10 @@
                         <h6>Điều kiện vé</h6>
                         <p class="price text-danger">{{ flight.flight_price | intcomma }} VNĐ</p>
                         <p>Một chiều</p>
-                        <button class="btn btn-success">Đặt vé</button>
+                         <button class="btn btn-success"
+                                onclick="window.location.href='/flight_details/{{ flight.flight_id }}'">
+                            Đặt vé
+                        </button>
                     </div>
                 </div>
             </div>
@@ -178,7 +181,7 @@
                         <p class="price text-danger">{{ (flight.flight_price * 2) | round(0) | intcomma }} VNĐ</p>
                         <p>Một chiều</p>
                         <button class="btn btn-success"
-                                onclick="window.location.href='/select_seat/{{ flight.flight_id }}'">
+                                onclick="window.location.href='/flight_details/{{ flight.flight_id }}'">
                             Đặt vé
                         </button>
                     </div>
@@ -196,6 +199,13 @@
     {% endif %}
 </div>
 
+<ul class="pagination justify-content-center mt-4">
+    {% for idx in range(1, pages + 1) %}
+    <li class="page-item {% if idx == current_page %}active{% endif %}">
+        <a class="page-link" href="{{ url_for('index', page=idx) }}">{{ idx }}</a>
+    </li>
+    {% endfor %}
+</ul>
 
 <!-- Popular Flight Route -->
 <div class="container mt-4">

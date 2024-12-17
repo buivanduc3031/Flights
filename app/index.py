@@ -1,9 +1,13 @@
+import math
+
 import unicodedata
 
 from flask import render_template, request, redirect, session, jsonify
 import dao, utils
 from app import app, login
 from flask_login import login_user, logout_user
+
+from app.dao import count_flights
 from app.models import UserRole, Seat, Flight
 from datetime import datetime
 
@@ -16,23 +20,33 @@ def remove_accents(input_str):
 
 @app.route("/")
 def index():
-
-    departure_name = request.args.get('departure', 'Ho Chi Minh')
-    departure_name = remove_accents(departure_name)
-
-
-    routes = dao.get_popular_routes(departure_name)
+        departure_name = request.args.get('departure', 'Ho Chi Minh')
+        departure_name = remove_accents(departure_name)
 
 
-    cities = ["Hồ Chí Minh", "Hà Nội", "Đà Nẵng", "Singapore", "Bangkok", "Taipei", "Seoul", "Tokyo"]
+        routes = dao.get_popular_routes(departure_name)
+
+        cities = ["Hồ Chí Minh", "Hà Nội", "Đà Nẵng", "Singapore", "Bangkok", "Taipei", "Seoul", "Tokyo"]
+
+        airports = dao.load_airports()
 
 
-    airports = dao.load_airports()
-    flights = dao.load_flights()
+        page = request.args.get('page', 1)
+        page = int(page)
 
-    # Trả về giao diện cùng dữ liệu
-    return render_template('index.html', airports=airports, routes=routes, cities=cities, flights=flights, departure_name=departure_name)
+        flights = dao.get_flights(page)
+        flights_counter = dao.count_flights()
+        total_pages = math.ceil(flights_counter / app.config['PAGE_SIZE'])
 
+        return render_template(
+            'index.html',
+            airports=airports,
+            routes=routes,
+            cities=cities,
+            flights=flights,
+            departure_name=departure_name,
+            pages=total_pages,
+        )
 
 
 @app.route('/register', methods=['get', 'post'])
@@ -124,12 +138,12 @@ def search_flights_route():
     total_passengers = adult_count + child_count + infant_count
 
     # Gọi hàm tìm chuyến bay
-    flights, error = dao.search_flights(departure, arrival, departure_date,total_passengers )
+    flights_result, error = dao.search_flights(departure, arrival, departure_date,total_passengers )
 
     if error:
         return render_template('booking.html', airports=dao.load_airports(), error=error)
 
-    return render_template('booking.html', flights=flights, airports=dao.load_airports(),total_passengers=total_passengers)
+    return render_template('booking.html', flights=flights_result, airports=dao.load_airports(),total_passengers=total_passengers)
 
 
 @app.route("/api/carts", methods=['post'])
@@ -167,45 +181,31 @@ def common_response_data():
     }
 
 
+@app.route("/flight_details/<int:flight_id>")
+def flight_details(flight_id):
+    flight = Flight.query.get(flight_id)
 
-# @app.route('/select_seat/<int:flight_id>', methods=['GET'])
-# def select_seat(flight_id):
-#     # Lấy session từ SQLAlchemy
-#     session = dao.get_db_session()
-#
-#     # Tìm chuyến bay với flight_id
-#     flight = session.query(Flight).filter_by(flight_id=flight_id).first()
-#     if flight:
-#         plane = flight.plane  # Lấy máy bay của chuyến bay này
-#         # Lấy tất cả ghế của máy bay này, không quan tâm đến trạng thái
-#         all_seats = plane.seats  # Lấy tất cả ghế thuộc máy bay
-#
-#     session.close()  # Đóng session
-#
-#     # Render template và truyền danh sách tất cả ghế
-#     return render_template('select_seat.html', seats=all_seats)
+    if flight:
+        # Lấy các thông tin từ chuyến bay và các bảng liên quan
+        plane_name = flight.plane.plane_name
+        company_name = flight.plane.company.com_name
+        departure_time = flight.f_dept_time.strftime('%H:%M')
+        arrival_time = flight.flight_arr_time.strftime('%H:%M')
+        flight_duration = flight.flight_duration
+        flight_price = flight.flight_price
 
-
-
-# @app.route('/book_seat', methods=['POST'])
-# def book_seat():
-#     # Lấy dữ liệu từ request
-#     data = request.get_json()
-#     seat_id = data['seat_id']
-#     flight_id = data['flight_id']
-#
-#     # Lấy session từ SQLAlchemy
-#     session = dao.get_db_session()
-#
-#     # Cập nhật ghế thành đã đặt
-#     seat = session.query(Seat).filter_by(seat_id=seat_id, flight_id=flight_id).first()
-#     if seat:
-#         seat.is_booked = True
-#         session.commit()  # Lưu thay đổi
-#
-#     session.close()  # Đóng session
-#
-#     return jsonify({'success': True})
+        # Truyền dữ liệu vào template
+        return render_template(
+            'flight_details.html',
+            plane_name=plane_name,
+            company_name=company_name,
+            departure_time=departure_time,
+            arrival_time=arrival_time,
+            flight_duration=flight_duration,
+            flight_price=flight_price
+        )
+    else:
+        return "Flight not found", 404
 
 
 if __name__ == '__main__':

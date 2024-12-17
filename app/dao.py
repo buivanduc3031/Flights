@@ -1,9 +1,7 @@
-from sqlalchemy import func, create_engine
-from sqlalchemy.dialects import mysql
-from sqlalchemy.orm import selectinload, sessionmaker
+from sqlalchemy import func
 
 from app.models import User, Airport, FlightRoute, Flight, Company, Plane, Seat, FlightType
-from app import db
+from app import db,app
 import hashlib
 import cloudinary.uploader
 from datetime import datetime
@@ -138,6 +136,26 @@ def search_flights(departure, arrival, departure_date,total_needed_seats):
             available_flights.append(flight)
 
     return available_flights,None
+
+
+def get_flights(page):
+    page_size = app.config['PAGE_SIZE']
+    if page < 1:
+        page = 1
+    start = (page - 1) * page_size
+    return (
+        Flight.query
+        .order_by(Flight.flight_id.desc())  # Use `.desc()` for descending order
+        .offset(start)
+        .limit(page_size)
+        .all()
+    )
+
+def count_flights():
+    return Flight.query.count()
+
+
+
 
 
 
