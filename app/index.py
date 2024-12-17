@@ -1,16 +1,12 @@
-from datetime import datetime
-
 import unicodedata
-from sqlalchemy.orm import selectinload
 
-from app import db
 from flask import render_template, request, redirect, session, jsonify
 import dao, utils
 from app import app, login
 from flask_login import login_user, logout_user
-from app.models import UserRole, Flight, Airport, FlightRoute, Plane, Seat
+from app.models import UserRole, Seat, Flight
 from datetime import datetime
-from sqlalchemy import func
+
 
 def remove_accents(input_str):
     return ''.join(
@@ -20,17 +16,17 @@ def remove_accents(input_str):
 
 @app.route("/")
 def index():
-    # Lấy tên thành phố từ query string hoặc mặc định là "Ho Chi Minh"
-    departure_name = request.args.get('departure', 'Ho Chi Minh')
-    departure_name = remove_accents(departure_name)  # Xử lý bỏ dấu
 
-    # Lấy các tuyến bay dựa trên thành phố xuất phát
+    departure_name = request.args.get('departure', 'Ho Chi Minh')
+    departure_name = remove_accents(departure_name)
+
+
     routes = dao.get_popular_routes(departure_name)
 
-    # Danh sách các thành phố phổ biến
+
     cities = ["Hồ Chí Minh", "Hà Nội", "Đà Nẵng", "Singapore", "Bangkok", "Taipei", "Seoul", "Tokyo"]
 
-    # Truy vấn dữ liệu sân bay và chuyến bay (nếu cần)
+
     airports = dao.load_airports()
     flights = dao.load_flights()
 
@@ -109,31 +105,31 @@ def get_user_by_id(user_id):
 
 @app.route('/booking', methods=['GET'])
 def flights():
-    # Lấy tất cả các chuyến bay và các thông tin liên quan
+
     airports = dao.load_airports()
-    # Truyền dữ liệu vào template
+
     return render_template('booking.html',airports=airports)
 
 
-
-
 @app.route('/search', methods=['GET'])
-def search_flights():
-    # Capture form data from the request
+def search_flights_route():
+    # Lấy thông tin từ yêu cầu
     departure = request.args.get('departure')
     arrival = request.args.get('arrival')
     departure_date = request.args.get('departure_date')
+    adult_count = int(request.args.get('adult_count', 1))
+    child_count = int(request.args.get('child_count', 0))
+    infant_count = int(request.args.get('infant_count', 0))
 
+    total_passengers = adult_count + child_count + infant_count
 
-    # Call the dao function to search for flights
-    flights, error = dao.search_flights(departure, arrival, departure_date)
+    # Gọi hàm tìm chuyến bay
+    flights, error = dao.search_flights(departure, arrival, departure_date,total_passengers )
 
-    # If there's an error (e.g., airports not found), return to index with error
     if error:
         return render_template('booking.html', airports=dao.load_airports(), error=error)
 
-    # Return the results to the template
-    return render_template('booking.html', flights=flights, airports=dao.load_airports())
+    return render_template('booking.html', flights=flights, airports=dao.load_airports(),total_passengers=total_passengers)
 
 
 @app.route("/api/carts", methods=['post'])
@@ -170,7 +166,48 @@ def common_response_data():
         'cart_stats': utils.cart_stats(session.get('cart'))
     }
 
+
+
+# @app.route('/select_seat/<int:flight_id>', methods=['GET'])
+# def select_seat(flight_id):
+#     # Lấy session từ SQLAlchemy
+#     session = dao.get_db_session()
+#
+#     # Tìm chuyến bay với flight_id
+#     flight = session.query(Flight).filter_by(flight_id=flight_id).first()
+#     if flight:
+#         plane = flight.plane  # Lấy máy bay của chuyến bay này
+#         # Lấy tất cả ghế của máy bay này, không quan tâm đến trạng thái
+#         all_seats = plane.seats  # Lấy tất cả ghế thuộc máy bay
+#
+#     session.close()  # Đóng session
+#
+#     # Render template và truyền danh sách tất cả ghế
+#     return render_template('select_seat.html', seats=all_seats)
+
+
+
+# @app.route('/book_seat', methods=['POST'])
+# def book_seat():
+#     # Lấy dữ liệu từ request
+#     data = request.get_json()
+#     seat_id = data['seat_id']
+#     flight_id = data['flight_id']
+#
+#     # Lấy session từ SQLAlchemy
+#     session = dao.get_db_session()
+#
+#     # Cập nhật ghế thành đã đặt
+#     seat = session.query(Seat).filter_by(seat_id=seat_id, flight_id=flight_id).first()
+#     if seat:
+#         seat.is_booked = True
+#         session.commit()  # Lưu thay đổi
+#
+#     session.close()  # Đóng session
+#
+#     return jsonify({'success': True})
+
+
 if __name__ == '__main__':
     with app.app_context():
-        from app import admin
         app.run(debug=True)

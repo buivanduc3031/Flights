@@ -1,8 +1,9 @@
-from sqlalchemy import func
-from sqlalchemy.orm import aliased, selectinload
+from sqlalchemy import func, create_engine
+from sqlalchemy.dialects import mysql
+from sqlalchemy.orm import selectinload, sessionmaker
 
-from app.models import User, Airport, FlightRoute, Flight, Company, Plane, Seat
-from app import app, db
+from app.models import User, Airport, FlightRoute, Flight, Company, Plane, Seat, FlightType
+from app import db
 import hashlib
 import cloudinary.uploader
 from datetime import datetime
@@ -75,10 +76,10 @@ def show_flights():
 
 
 def get_popular_routes(departure_name=None):
-    # Alias cho bảng airport
+
     arrival_airport = db.aliased(Airport)
 
-    # Truy vấn cơ bản
+
     query = db.session.query(
         FlightRoute.fr_id,
         Airport.airport_name.label('departure'),
@@ -91,47 +92,52 @@ def get_popular_routes(departure_name=None):
         arrival_airport, FlightRoute.arrival_airport_id == arrival_airport.airport_id
     )
 
-    # Lọc theo tên sân bay nếu `departure_name` được cung cấp
     if departure_name:
         query = query.filter(Airport.airport_address.ilike(f"%{departure_name}%"))
 
     return query.all()
 
 
-def load_flights():
 
-    flights = db.session.query(Flight) \
-        .join(Plane) \
-        .join(FlightRoute, Flight.flight_route_id == FlightRoute.fr_id) \
-        .options(
-        selectinload(Flight.plane)  # Sử dụng selectinload để tải thông tin máy bay
-    ).all()
 
-    return flights
 
-def search_flights(departure, arrival, departure_date):
-    # Query the Airport model for departure and arrival airports
+def search_flights(departure, arrival, departure_date,total_needed_seats):
+    # Tìm kiếm sân bay đi và đến
     departure_airport = Airport.query.filter_by(airport_name=departure).first()
     arrival_airport = Airport.query.filter_by(airport_name=arrival).first()
 
     if not departure_airport or not arrival_airport:
         return None, "Airport not found"
 
-    # Query FlightRoute model for matching routes
+    # Lọc các tuyến bay từ sân bay đi đến sân bay đến
     flight_routes = FlightRoute.query.filter(
         FlightRoute.departure_airport_id == departure_airport.airport_id,
         FlightRoute.arrival_airport_id == arrival_airport.airport_id
     ).all()
 
     if not flight_routes:
-        return [], None  # No matching routes
+        return [], None
 
-    # Query Flight model for flights on the specified date
+    # Chuyển ngày đi thành định dạng đối tượng date
     departure_date_obj = datetime.strptime(departure_date, '%Y-%m-%d').date() if departure_date else None
+
+    # Lọc chuyến bay theo tuyến bay và ngày đi
     flights = Flight.query.filter(
         Flight.flight_route_id.in_([route.fr_id for route in flight_routes]),
         func.date(Flight.f_dept_time) == departure_date_obj
     ).all()
 
-    return flights, None
+    available_flights = []
+
+    for flight in flights:
+        available_economy_seats = flight.available_economy_seats()  # Số ghế ECONOMY còn lại
+        available_business_seats = flight.available_business_seats()  # Số ghế BUSINESS còn lại
+
+        # Kiểm tra nếu có đủ ghế cho hành khách
+        if available_economy_seats >= total_needed_seats or available_business_seats >= total_needed_seats:
+            available_flights.append(flight)
+
+    return available_flights,None
+
+
 

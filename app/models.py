@@ -75,8 +75,8 @@ class Plane(db.Model):
     plane_name = Column(String(255), nullable=False)
     total_seat = Column(Integer, nullable=False)
     company_id = Column(Integer, ForeignKey('company.com_id'), nullable=False)  # Khóa ngoại liên kết đến bảng Company
-    seats = relationship('Seat', backref='plane', lazy=True, cascade="all, delete")
 
+    seats = relationship('Seat', backref='plane', lazy=True, cascade="all, delete")
     company = relationship('Company', backref='planes', lazy=True)  # Mối quan hệ với Company
 
     def __str__(self):

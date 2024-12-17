@@ -38,17 +38,18 @@
                     <label class="form-label">Ngày khởi hành</label>
                     <input type="date" class="form-control mt-2" id="departure_date" placeholder="Ngày khởi hành"
                            name="departure_date" required>
-
                 </div>
                 <div class="col-md-6">
                     <div class="form-check d-flex align-items-center mb-3">
-                        <input class="form-check-input me-2" type="checkbox" id="roundTrip" checked
+                        <input class="form-check-input me-2" type="checkbox" id="roundTrip"
                                onclick="toggleReturnDate()">
                         <label class="form-check-label" for="roundTrip" style="font-weight: bold;">Khứ hồi</label>
                     </div>
-                    <input type="date" class="form-control" id="return_date" name="return_date">
+                    <input type="date" class="form-control" id="return_date" name="return_date" style="display: none;">
+
                 </div>
             </div>
+
 
             <div class="row mb-3">
                 <div class="col-md-6">
@@ -62,7 +63,8 @@
                                     <span>Người lớn</span>
                                     <div class="controls">
                                         <button type="button" class="btn decrease" onclick>-</button>
-                                        <input type="number" value="1" min="0" class="number-input" id="adult-count">
+                                        <input type="number" value="1" min="1" class="number-input" id="adult-count"
+                                               name="adult_count">
                                         <button type="button" class="btn increase">+</button>
                                     </div>
                                 </div>
@@ -70,7 +72,8 @@
                                     <span>Trẻ em</span>
                                     <div class="controls">
                                         <button type="button" class="btn decrease">-</button>
-                                        <input type="number" value="0" min="0" class="number-input" id="child-count">
+                                        <input type="number" value="0" min="0" class="number-input" id="child-count"
+                                               name="child_count">
                                         <button type="button" class="btn increase">+</button>
                                     </div>
                                 </div>
@@ -78,7 +81,8 @@
                                     <span>Em bé</span>
                                     <div class="controls">
                                         <button type="button" class="btn decrease">-</button>
-                                        <input type="number" value="0" min="0" class="number-input" id="infant-count">
+                                        <input type="number" value="0" min="0" class="number-input" id="infant-count"
+                                               name="infant_count">
                                         <button type="button" class="btn increase">+</button>
                                     </div>
                                 </div>
@@ -119,7 +123,7 @@
                 </div>
                 <div class="time text-center">
                     <h6 class="mb-0 text-success">{{ flight.flight_arr_time.strftime('%H:%M') }}</h6>
-                    <span class="text-muted d-block">{{ flight.flight_route.arrival_airport.airport_name }}</span>
+                    <span class="text-muted d-block">{{ flight.flight_route.arrival_airport.airport_name  }}</span>
                 </div>
                 <div class="price text-danger">
                     <span>{{ flight.flight_price | intcomma }} VNĐ</span>
@@ -135,7 +139,6 @@
     </div>
 
     <!-- Economy Cards -->
-
     <div class="collapse mt-2" id="economyDetails-{{ flight.flight_id }}">
         <div class="row">
             {% if flight.available_economy_seats() > 0 %}
@@ -157,7 +160,7 @@
                     </div>
                 </div>
             </div>
-            {%endif%}
+            {% endif %}
 
             {% if flight.available_business_seats() > 0 %}
             <div class="col-md-4 mb-3">
@@ -172,18 +175,20 @@
                             <li><i class="bi bi-bag-check"></i> Xách tay: <strong>1 kiện 07 kg</strong></li>
                         </ul>
                         <h6>Điều kiện vé</h6>
-                        <p class="price text-danger">{{ (flight.flight_price * 2) | round(0) | intcomma }}
-                            VNĐ</p>
+                        <p class="price text-danger">{{ (flight.flight_price * 2) | round(0) | intcomma }} VNĐ</p>
                         <p>Một chiều</p>
-                        <button class="btn btn-success">Đặt vé</button>
+                        <button class="btn btn-success"
+                                onclick="window.location.href='/select_seat/{{ flight.flight_id }}'">
+                            Đặt vé
+                        </button>
                     </div>
                 </div>
             </div>
-            {%endif%}
-
+            {% endif %}
         </div>
     </div>
     {% endfor %}
+
     {% else %}
     <div class="alert alert-warning" role="alert">
         Không có chuyến bay nào phù hợp với tiêu chí tìm kiếm của bạn.
@@ -227,50 +232,6 @@
         {% endif %}
     </div>
 </div>
-<script>
-    function changeCity(cityName) {
-  // Lưu lại vị trí cuộn hiện tại
-  const currentScrollPosition = window.scrollY;
-
-  // Cập nhật URL mà không làm reload trang
-  const newUrl = "?departure=" + cityName;
-  history.pushState(null, null, newUrl); // Thay đổi URL mà không reload trang
-
-  // Lấy tất cả các phần tử có class 'btn' để cập nhật lại class 'active'
-  const buttons = document.querySelectorAll('.btn-outline-primary');
-
-  // Loại bỏ class 'active' khỏi tất cả các button
-  buttons.forEach(button => {
-      button.classList.remove('active', 'btn-primary', 'text-white');
-  });
-
-  // Tìm phần tử của thành phố được chọn và thêm class 'active' cho nó
-  const selectedButton = document.querySelector(`a[onclick="changeCity('${cityName}')"]`);
-  if (selectedButton) {
-      selectedButton.classList.add('active', 'btn-primary', 'text-white');
-  }
-
-  // Gửi request tới server để lấy dữ liệu mới cho phần routes
-  fetch(newUrl)
-      .then(response => response.text())
-      .then(data => {
-          // Tìm phần nội dung của tuyến bay mới từ dữ liệu trả về
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(data, 'text/html');
-          const newRoutes = doc.querySelector('#routes-section'); // Lấy phần routes-section từ dữ liệu trả về
-
-          // Cập nhật phần nội dung tuyến bay mà không reload toàn bộ trang
-          document.getElementById('routes-section').innerHTML = newRoutes.innerHTML;
-
-          // Trả lại vị trí cuộn trước đó
-          window.scrollTo(0, currentScrollPosition);
-      })
-      .catch(error => {
-          console.error('Error fetching new data:', error);
-      });
-}
-
-</script>
 
 <!-- End Popular Flight Route -->
 

@@ -37,17 +37,18 @@
                     <label class="form-label">Ngày khởi hành</label>
                     <input type="date" class="form-control mt-2" id="departure_date" placeholder="Ngày khởi hành"
                            name="departure_date" required>
-
                 </div>
                 <div class="col-md-6">
                     <div class="form-check d-flex align-items-center mb-3">
-                        <input class="form-check-input me-2" type="checkbox" id="roundTrip" checked
+                        <input class="form-check-input me-2" type="checkbox" id="roundTrip"
                                onclick="toggleReturnDate()">
                         <label class="form-check-label" for="roundTrip" style="font-weight: bold;">Khứ hồi</label>
                     </div>
-                    <input type="date" class="form-control" id="return_date" name="return_date">
+                    <input type="date" class="form-control" id="return_date" name="return_date" style="display: none;">
+
                 </div>
             </div>
+
 
             <div class="row mb-3">
                 <div class="col-md-6">
@@ -61,7 +62,8 @@
                                     <span>Người lớn</span>
                                     <div class="controls">
                                         <button type="button" class="btn decrease" onclick>-</button>
-                                        <input type="number" value="1" min="0" class="number-input" id="adult-count">
+                                        <input type="number" value="1" min="1" class="number-input" id="adult-count"
+                                               name="adult_count">
                                         <button type="button" class="btn increase">+</button>
                                     </div>
                                 </div>
@@ -69,7 +71,8 @@
                                     <span>Trẻ em</span>
                                     <div class="controls">
                                         <button type="button" class="btn decrease">-</button>
-                                        <input type="number" value="0" min="0" class="number-input" id="child-count">
+                                        <input type="number" value="0" min="0" class="number-input" id="child-count"
+                                               name="child_count">
                                         <button type="button" class="btn increase">+</button>
                                     </div>
                                 </div>
@@ -77,7 +80,8 @@
                                     <span>Em bé</span>
                                     <div class="controls">
                                         <button type="button" class="btn decrease">-</button>
-                                        <input type="number" value="0" min="0" class="number-input" id="infant-count">
+                                        <input type="number" value="0" min="0" class="number-input" id="infant-count"
+                                               name="infant_count">
                                         <button type="button" class="btn increase">+</button>
                                     </div>
                                 </div>
@@ -219,7 +223,7 @@
 
             <div class="collapse mt-2" id="economyDetails-{{ flight.flight_id }}">
                 <div class="row">
-                    {% if flight.available_economy_seats() > 0 %}
+                    {% if flight.available_economy_seats() >= total_passengers %}
                     <div class="col-md-4 mb-3">
                         <div class="card border-warning">
                             <div class="card-body">
@@ -234,13 +238,16 @@
                                 <h6>Điều kiện vé</h6>
                                 <p class="price text-danger">{{ flight.flight_price | intcomma }} VNĐ</p>
                                 <p>Một chiều</p>
-                                <button class="btn btn-success">Đặt vé</button>
+                                <button class="btn btn-success"
+                                        onclick="window.location.href='/payment_info/{{ flight.flight_id }}'">
+                                    Đặt vé
+                                </button>
                             </div>
                         </div>
                     </div>
                     {%endif%}
 
-                    {% if flight.available_business_seats() > 0 %}
+                    {% if flight.available_business_seats() >= total_passengers %}
                     <div class="col-md-4 mb-3">
                         <div class="card border-warning">
                             <div class="card-body">
@@ -256,7 +263,10 @@
                                 <p class="price text-danger">{{ (flight.flight_price * 2) | round(0) | intcomma }}
                                     VNĐ</p>
                                 <p>Một chiều</p>
-                                <button class="btn btn-success">Đặt vé</button>
+                                <button class="btn btn-success"
+                                        onclick="window.location.href='/payment_info/{{ flight.flight_id }}'">
+                                    Đặt vé
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -275,7 +285,6 @@
 
     </div>
 </div>
-
 
 
 {% endblock %}

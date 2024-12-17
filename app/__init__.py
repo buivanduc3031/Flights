@@ -3,6 +3,7 @@ from urllib.parse import quote
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 import cloudinary
+from sqlalchemy import create_engine
 from unidecode import unidecode
 
 
@@ -14,6 +15,7 @@ app.config["PAGE_SIZE"] = 4
 
 db = SQLAlchemy(app)
 login = LoginManager(app)
+
 
 cloudinary.config(
     cloud_name="dd1frsvzk",
