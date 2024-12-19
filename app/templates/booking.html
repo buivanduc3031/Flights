@@ -2,7 +2,8 @@
 
 {% block content %}
 
-<div class="container mt-5">
+<div class="container">
+    <h2 class="text-center my-4" style="color: #ff5722; font-weight: bold;">Flight Booking</h2>
     <div class="form-section p-4 rounded" style="background-color: #fff8f0; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
         <form method="GET" action="/search">
             <div class="row mb-3">
@@ -101,87 +102,7 @@
         </form>
     </div>
 
-    <div class="row mt-5">
-        <!-- Bộ lọc bên trái -->
-        <div class="col-md-3">
-            <div class="card p-3 border rounded shadow-sm bg-light">
-                <h5 class="text-primary">Bộ lọc</h5>
-                <h6 class="text-secondary">Điểm dừng</h6>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="directFlight">
-                    <label class="form-check-label" for="directFlight">Bay thẳng</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="oneStop">
-                    <label class="form-check-label" for="oneStop">1 điểm dừng</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="multipleStops">
-                    <label class="form-check-label" for="multipleStops">Nhiều điểm dừng</label>
-                </div>
-
-                <h6 class="text-secondary">Giờ cất cánh</h6>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="departureNight">
-                    <label class="form-check-label" for="departureNight">
-                        Đêm
-                        <span class="time-range">(00:00 - 06:00)</span>
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="departureMorning">
-                    <label class="form-check-label" for="departureMorning">
-                        Sáng
-                        <span class="time-range">(06:00 - 12:00)</span>
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="departureAfternoon">
-                    <label class="form-check-label" for="departureAfternoon">
-                        Chiều
-                        <span class="time-range">(12:00 - 18:00)</span>
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="departureEvening">
-                    <label class="form-check-label" for="departureEvening">
-                        Tối
-                        <span class="time-range">(18:00 - 24:00)</span>
-                    </label>
-                </div>
-
-                <h6 class="text-secondary">Giờ hạ cánh</h6>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="arrivalNight">
-                    <label class="form-check-label" for="arrivalNight">
-                        Đêm
-                        <span class="time-range">(00:00 - 06:00)</span>
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="arrivalMorning">
-                    <label class="form-check-label" for="arrivalMorning">
-                        Sáng
-                        <span class="time-range">(06:00 - 12:00)</span>
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="arrivalAfternoon">
-                    <label class="form-check-label" for="arrivalAfternoon">
-                        Chiều
-                        <span class="time-range">(12:00 - 18:00)</span>
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="arrivalEvening">
-                    <label class="form-check-label" for="arrivalEvening">
-                        Tối
-                        <span class="time-range">(18:00 - 24:00)</span>
-                    </label>
-                </div>
-            </div>
-        </div>
-
+    <div class="container mt-5 d-flex justify-content-center">
         <!--    flight    -->
         <div class="col-md-9">
             {% if flights %}
@@ -223,11 +144,11 @@
 
             <div class="collapse mt-2" id="economyDetails-{{ flight.flight_id }}">
                 <div class="row">
-                    {% if flight.available_economy_seats() >= total_passengers %}
+                    {% if flight.available_economy_seats() >= 0 %}
                     <div class="col-md-4 mb-3">
                         <div class="card border-warning">
                             <div class="card-body">
-                                <h5 class="card-title text-info">Economy Standard</h5>
+                                <h5 class="card-title text-info">ECONOMY</h5>
                                 <p class="card-text">Eco</p>
                                 <hr>
                                 <h6>Hành lý</h6>
@@ -239,7 +160,14 @@
                                 <p class="price text-danger">{{ flight.flight_price | intcomma }} VNĐ</p>
                                 <p>Một chiều</p>
                                 <button class="btn btn-success"
-                                        onclick="window.location.href='/flight_details/{{ flight.flight_id }}'">
+                                        onclick="addToCart(
+                                        '{{ flight.flight_id }}',
+                                        '{{ flight.plane_name }}',
+                                        '{{ flight.flight_route.departure_airport.airport_name }}',
+                                        '{{ flight.flight_route.arrival_airport.airport_name }}',
+                                        '{{ flight.f_dept_time.strftime('%Y-%m-%d') }}',
+                                        'ECONOMY',
+                                        '{{ flight.flight_price }}')">
                                     Đặt vé
                                 </button>
                             </div>
@@ -247,11 +175,11 @@
                     </div>
                     {%endif%}
 
-                    {% if flight.available_business_seats() >= total_passengers %}
+                    {% if flight.available_business_seats() >= 0 %}
                     <div class="col-md-4 mb-3">
                         <div class="card border-warning">
                             <div class="card-body">
-                                <h5 class="card-title text-info">Economy Premium</h5>
+                                <h5 class="card-title text-info">BUSINESS</h5>
                                 <p class="card-text">Eco</p>
                                 <hr>
                                 <h6>Hành lý</h6>
@@ -264,7 +192,14 @@
                                     VNĐ</p>
                                 <p>Một chiều</p>
                                 <button class="btn btn-success"
-                                        onclick="window.location.href='/flight_details/{{ flight.flight_id }}'">
+                                        onclick="addToCart(
+                                        '{{ flight.flight_id }}',
+                                        '{{ flight.plane_name }}',
+                                        '{{ flight.flight_route.departure_airport.airport_name }}',
+                                        '{{ flight.flight_route.arrival_airport.airport_name }}',
+                                        '{{ flight.f_dept_time.strftime('%Y-%m-%d') }}',
+                                        'BUSINESS',
+                                        '{{ flight.flight_price }}')">
                                     Đặt vé
                                 </button>
                             </div>
@@ -281,10 +216,10 @@
             </div>
             {% endif %}
         </div>
-
-
     </div>
 </div>
 
+    <!-- End Popular Flight Route -->
 
-{% endblock %}
+
+    {% endblock %}

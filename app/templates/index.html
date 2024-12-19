@@ -145,7 +145,7 @@
             <div class="col-md-4 mb-3">
                 <div class="card border-warning">
                     <div class="card-body">
-                        <h5 class="card-title text-info">Economy Standard</h5>
+                        <h5 class="card-title text-info">Economy</h5>
                         <p class="card-text">Eco</p>
                         <hr>
                         <h6>Hành lý</h6>
@@ -157,9 +157,16 @@
                         <p class="price text-danger">{{ flight.flight_price | intcomma }} VNĐ</p>
                         <p>Một chiều</p>
                          <button class="btn btn-success"
-                                onclick="window.location.href='/flight_details/{{ flight.flight_id }}'">
-                            Đặt vé
-                        </button>
+                                        onclick="addToCart(
+                                        '{{ flight.flight_id }}',
+                                        '{{ flight.plane_name }}',
+                                        '{{ flight.flight_route.departure_airport.airport_name }}',
+                                        '{{ flight.flight_route.arrival_airport.airport_name }}',
+                                        '{{ flight.f_dept_time.strftime('%Y-%m-%d') }}',
+                                        'ECONOMY',
+                                        '{{ flight.flight_price }}')">
+                                    Đặt vé
+                                </button>
                     </div>
                 </div>
             </div>
@@ -169,7 +176,7 @@
             <div class="col-md-4 mb-3">
                 <div class="card border-warning">
                     <div class="card-body">
-                        <h5 class="card-title text-info">Economy Premium</h5>
+                        <h5 class="card-title text-info">BUSINESS</h5>
                         <p class="card-text">Eco</p>
                         <hr>
                         <h6>Hành lý</h6>
@@ -180,10 +187,17 @@
                         <h6>Điều kiện vé</h6>
                         <p class="price text-danger">{{ (flight.flight_price * 2) | round(0) | intcomma }} VNĐ</p>
                         <p>Một chiều</p>
-                        <button class="btn btn-success"
-                                onclick="window.location.href='/flight_details/{{ flight.flight_id }}'">
-                            Đặt vé
-                        </button>
+                       <button class="btn btn-success"
+                                        onclick="addToCart(
+                                        '{{ flight.flight_id }}',
+                                        '{{ flight.plane_name }}',
+                                        '{{ flight.flight_route.departure_airport.airport_name }}',
+                                        '{{ flight.flight_route.arrival_airport.airport_name }}',
+                                        '{{ flight.f_dept_time.strftime('%Y-%m-%d') }}',
+                                        'BUSINESS',
+                                        '{{ flight.flight_price }}')">
+                                    Đặt vé
+                                </button>
                     </div>
                 </div>
             </div>

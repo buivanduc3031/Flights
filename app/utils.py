@@ -1,6 +1,7 @@
 def cart_stats(cart):
-    # total_quantity = sum(item['quantity'] for item in cart.values())
-    # total_price = sum(item['quantity'] * item['price'] for item in cart.values())
-    total_quantity = 10
-    total_price = 10
-    return {'total_quantity': total_quantity, 'total_price': total_price}
+    total_quantity, total_amount = 0, 0
+    if cart:
+        for c in cart.values():
+            total_quantity += c['quantity']
+            total_amount += c['quantity'] * c['price']
+    return {'total_quantity': total_quantity, 'total_price': total_amount}

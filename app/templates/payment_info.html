@@ -5,62 +5,33 @@
     <div class="row">
         <div class="col">
             <div class="card shadow p-4">
-                <h5 class="card-title text-primary fw-bold mb-3">{flight.flight_route.arrival_airport → Đà Nẵng</h5>
-                <p class="mb-1"><i class="bi bi-calendar-event"></i> Chiều đi: <strong>T4, 11/12/2024</strong></p>
+                <p class="mb-1"><i class="bi bi-calendar-event"></i> Ngày đi: <strong>{{departure_date}}</strong></p>
                 <div class="d-flex justify-content-between align-items-center">
                     <!-- Cột bên trái: Tiêu đề -->
                     <div>
-                        <p class="mb-1"><i class="bi bi-airplane"></i> <strong>Bamboo Airways</strong></p>
+                        <p class="mb-1"><i class="bi bi-airplane"></i> <strong>{{company_name}}</strong></p>
                     </div>
 
                     <!-- Cột bên phải: Chi tiết thời gian bay -->
                     <div class="d-flex align-items-center">
                         <!-- Giờ đi -->
                         <div class="text-center me-4">
-                            <div class="fw-bold fs-5">05:55</div>
-                            <div class="text-muted small">Sân bay Hà Nội</div>
+                            <div class="fw-bold fs-5">{{departure_time}}</div>
+                            <div class="text-muted small">{{departure_local}}</div>
                         </div>
 
                         <!-- Mũi tên và thời gian bay -->
                         <div class="text-center me-4">
-                            <div class="small text-secondary">1g 25p</div>
+                            <div class="small text-secondary">{{flight_duration}} h</div>
                             <div><i class="bi bi-arrow-right"></i></div>
-                            <div class="small text-secondary">Bay thẳng</div>
+                            <div class="small text-secondary">{{flight_type}}</div>
                         </div>
 
                         <!-- Giờ đến -->
                         <div class="text-center">
-                            <div class="fw-bold fs-5">07:20</div>
-                            <div class="text-muted small">Sân bay Đà Nẵng</div>
+                            <div class="fw-bold fs-5">{{arrival_time}}</div>
+                            <div class="text-muted small">{{arrival_local}}</div>
                         </div>
-                    </div>
-                </div>
-
-                <hr>
-
-                <h6 class="fw-bold">Hành khách 1 (Người lớn)</h6>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label for="firstName" class="form-label">Họ</label>
-                        <input type="text" class="form-control" id="firstName" placeholder="Nhập họ" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="fullName" class="form-label">Tên đệm và tên</label>
-                        <input type="text" class="form-control" id="fullName" placeholder="Nhập tên đệm và tên"
-                               required>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="dob" class="form-label">Ngày tháng năm sinh</label>
-                        <input type="date" class="form-control" id="dob" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="gender" class="form-label">Giới tính</label>
-                        <select class="form-select" id="gender" required>
-                            <option value="" disabled selected>Chọn giới tính</option>
-                            <option value="male">Nam</option>
-                            <option value="female">Nữ</option>
-                            <option value="other">Khác</option>
-                        </select>
                     </div>
                 </div>
 
@@ -69,22 +40,13 @@
                 <h6 class="fw-bold">Thông tin liên hệ</h6>
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label for="contactName" class="form-label">Danh xưng</label>
-                        <select class="form-select" id="contactName" required>
-                            <option value="" disabled selected>Chọn danh xưng</option>
-                            <option value="Mr">Ông</option>
-                            <option value="Ms">Bà</option>
-                            <option value="Mrs">Cô</option>
-                        </select>
+                         <label for="contactFullName" class="form-label">Tên đệm và tên</label>
+                        <input type="text" class="form-control" id="contactFullName" placeholder="Nhập tên đệm và tên"
+                               required>
                     </div>
                     <div class="col-md-6">
                         <label for="contactFirstName" class="form-label">Họ</label>
                         <input type="text" class="form-control" id="contactFirstName" placeholder="Nhập họ" required>
-                    </div>
-                    <div class="col-md-12">
-                        <label for="contactFullName" class="form-label">Tên đệm và tên</label>
-                        <input type="text" class="form-control" id="contactFullName" placeholder="Nhập tên đệm và tên"
-                               required>
                     </div>
                     <div class="col-md-6">
                         <label for="contactPhone" class="form-label">Số điện thoại</label>
@@ -100,8 +62,16 @@
                 <hr>
 
                 <div class="d-flex justify-content-between align-items-center mt-4">
-                    <div class="total text-success fw-bold">Tổng: 1,455,000 đ</div>
-                    <button class="btn btn-primary">Tiếp tục</button>
+                    {% if type_ticket == 'BUSINESS' %}
+                    <div class="total text-success fw-bold">Tổng: {{flight_price*2*quantity}} đ</div>
+                    {% else %}
+                    <div class="total text-success fw-bold">Tổng: {{flight_price}} đ</div>
+                    {% endif %}
+                    <button
+                            class="btn btn-success"
+                            onclick="location.href='{{ url_for('payment_qr',flight_id=flight_id,quantity=quantity,type_ticket=type_ticket) }}'">
+                        Tiếp tục
+                    </button>
                 </div>
             </div>
         </div>
@@ -111,11 +81,14 @@
                 <h5 class="card-title text-primary mb-3">Thông tin hành lý</h5>
 
                 <!-- Luggage Information Section -->
-                <h6 class="mt-3">Người lớn (Hành khách 1)</h6>
                 <ul class="list-unstyled">
                     <li class="d-flex justify-content-between align-items-center mb-2">
                         <i class="bi bi-bag fs-5"></i> Hành lý ký gửi:
+                        {% if type_ticket == 'BUSINESS' %}
+                        <strong class="ms-auto">1 kiện</strong>
+                        {% else %}
                         <strong class="ms-auto text-muted">Chưa bao gồm</strong>
+                        {% endif %}
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-2">
                         <i class="bi bi-bag-check fs-5"></i> Hành lý xách tay:
@@ -123,26 +96,19 @@
                     </li>
                 </ul>
 
+
                 <hr>
 
                 <!-- Ticket Price Details Section -->
-                <h5 class="card-title text-primary mb-3">Chi tiết giá vé</h5>
-                <ul class="list-unstyled">
-                    <li class="d-flex justify-content-between mb-2">
-                        Hành khách (1 người lớn): <strong class="text-end">1,455,000 đ</strong>
-                    </li>
-                    <li class="d-flex justify-content-between mb-2">
-                        Giá vé: <strong class="text-end">809,000 đ</strong>
-                    </li>
-                    <li class="d-flex justify-content-between mb-2">
-                        Thuế và phí: <strong class="text-end">646,000 đ</strong>
-                    </li>
-                </ul>
+                <h5 class="card-title text-primary mb-3">Giá vé</h5>
 
-                <hr>
                 <div class="d-flex justify-content-between align-items-center">
                     <span class="fw-bold">Tổng</span>
-                    <span class="total text-success fw-bold">1,455,000 đ</span>
+                    {% if type_ticket == 'BUSINESS' %}
+                    <span class="total text-success fw-bold">{{flight_price*quantity*2}} đ</span>
+                    {% else %}
+                    <span class="total text-success fw-bold">{{flight_price*quantity}} đ</span>
+                    {% endif %}
                 </div>
             </div>
 
