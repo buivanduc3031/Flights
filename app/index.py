@@ -7,7 +7,6 @@ import dao, utils
 from app import app, login
 from flask_login import login_user, logout_user
 
-from app.dao import count_flights
 from app.models import UserRole, Seat, Flight
 from datetime import datetime
 
@@ -117,14 +116,6 @@ def get_user_by_id(user_id):
 
 
 
-@app.route('/booking', methods=['GET'])
-def flights():
-
-    airports = dao.load_airports()
-
-    return render_template('booking.html',airports=airports)
-
-
 @app.route('/search', methods=['GET'])
 def search_flights_route():
     # Lấy thông tin từ yêu cầu
@@ -146,26 +137,121 @@ def search_flights_route():
     return render_template('booking.html', flights=flights_result, airports=dao.load_airports(),total_passengers=total_passengers)
 
 
+
+
+@app.route("/payment_info/<int:flight_id>/<int:quantity>/<type_ticket>")
+def payment_info(flight_id,quantity,type_ticket):
+    flight = Flight.query.get(flight_id)
+
+    if flight:
+        # Lấy các thông tin từ chuyến bay và các bảng liên quan
+        company_name = flight.plane.company.com_name
+        departure_time = flight.f_dept_time.strftime('%H:%M')
+        arrival_time = flight.flight_arr_time.strftime('%H:%M')
+        arrival_local =  flight.flight_route.arrival_airport.airport_name
+        departure_local = flight.flight_route.departure_airport.airport_name
+        flight_duration = flight.flight_duration
+        flight_type=flight.flight_type.name
+        flight_price = flight.flight_price
+        departure_date = flight.f_dept_time.date()
+        formatted_date = departure_date.strftime('%Y-%m-%d')
+
+        # Truyền dữ liệu vào template
+        return render_template(
+            'payment_info.html',
+            flight_id=flight_id,
+            company_name=company_name,
+            departure_time=departure_time,
+            arrival_time=arrival_time,
+            arrival_local=arrival_local,
+            departure_local=departure_local,
+            flight_duration=flight_duration,
+            flight_price=flight_price,
+            departure_date =formatted_date,
+            flight_type=flight_type,
+            quantity=quantity,
+            type_ticket=type_ticket
+        )
+    else:
+        return "Flight not found", 404
+
+@app.route("/payment_qr/<int:flight_id>/<int:quantity>/<type_ticket>")
+def payment_qr(flight_id,quantity,type_ticket):
+    flight = Flight.query.get(flight_id)
+
+    if flight:
+        # Lấy các thông tin từ chuyến bay và các bảng liên quan
+        company_name = flight.plane.company.com_name
+        departure_time = flight.f_dept_time.strftime('%H:%M')
+        arrival_time = flight.flight_arr_time.strftime('%H:%M')
+        arrival_local =  flight.flight_route.arrival_airport.airport_name
+        departure_local = flight.flight_route.departure_airport.airport_name
+        flight_duration = flight.flight_duration
+        flight_type=flight.flight_type.name
+        flight_price = flight.flight_price
+        departure_date = flight.f_dept_time.date()
+        formatted_date = departure_date.strftime('%Y-%m-%d')
+
+        # Truyền dữ liệu vào template
+        return render_template(
+            'payment_qr.html',
+            company_name=company_name,
+            departure_time=departure_time,
+            arrival_time=arrival_time,
+            arrival_local=arrival_local,
+            departure_local=departure_local,
+            flight_duration=flight_duration,
+            flight_price=flight_price,
+            departure_date =formatted_date,
+            flight_type=flight_type,
+            quantity=quantity,
+            type_ticket=type_ticket
+        )
+    else:
+        return "Flight not found", 404
+
+@app.route('/booking', methods=['GET'])
+def flights():
+    airports = dao.load_airports()
+
+    return render_template('booking.html', airports=airports)
+
+
 @app.route("/api/carts", methods=['post'])
 def add_to_cart():
-    cart = session.get('cart')
+    cart = session.get('cart', {})
 
+    # Dữ liệu từ request JSON
+    data = request.json
+    flight_id = str(data.get('flight_id'))
+    plane_name = data.get('plane_name')
+    departure = data.get('departure')
+    arrival = data.get('arrival')
+    day = data.get('day')
+    type_ticket = data.get('type_ticket')
+    price = data.get('price')
 
-    if not cart:
-        cart = {}
-        print(request.json)
-        id = str(request.json.get('id'))
-        flight_number = request.json.get('flight_number')
-        departure = request.json.get('departure')
-        arrival = request.json.get('arrival')
-        price = request.json.get('price')
-    if id in cart:
-        cart[id]['quantity'] += 1
+    # Tạo khóa unique cho flight_id và type_ticket
+    cart_key = f"{flight_id}_{type_ticket}"
+
+    if cart_key in cart:
+        # Nếu khóa đã tồn tại, tăng số lượng vé
+        cart[cart_key]['quantity'] += 1
     else:
-        cart[id] = {"id": id, "flight_number": flight_number, "departure": departure,
-                    "arrival": arrival, "price": price, "quantity": 1}
+        # Nếu chưa tồn tại, tạo mục mới
+        cart[cart_key] = {
+            "flight_id": flight_id,
+            "plane_name": plane_name,
+            "departure": departure,
+            "arrival": arrival,
+            "day": day,
+            "type_ticket": type_ticket,
+            "price": float(price),
+            "quantity": 1
+        }
+
     session['cart'] = cart
-    print(session['cart'])
+    print(cart)
 
     return jsonify(utils.cart_stats(cart))
 
@@ -181,31 +267,56 @@ def common_response_data():
     }
 
 
-@app.route("/flight_details/<int:flight_id>")
-def flight_details(flight_id):
-    flight = Flight.query.get(flight_id)
+@app.route('/cart/delete', methods=['POST'])
+def delete_cart_item():
+    flight_id = request.json.get('flight_id')
+    type_ticket = request.json.get('type_ticket')
 
-    if flight:
-        # Lấy các thông tin từ chuyến bay và các bảng liên quan
-        plane_name = flight.plane.plane_name
-        company_name = flight.plane.company.com_name
-        departure_time = flight.f_dept_time.strftime('%H:%M')
-        arrival_time = flight.flight_arr_time.strftime('%H:%M')
-        flight_duration = flight.flight_duration
-        flight_price = flight.flight_price
+    if 'cart' in session:
+        # Tìm và xóa phần tử giỏ hàng dựa trên flight_id và type_ticket
+        cart = session['cart']
+        key_to_delete = None
+        for key, item in cart.items():
+            if item['flight_id'] == flight_id and item['type_ticket'] == type_ticket:
+                key_to_delete = key
+                break
 
-        # Truyền dữ liệu vào template
-        return render_template(
-            'flight_details.html',
-            plane_name=plane_name,
-            company_name=company_name,
-            departure_time=departure_time,
-            arrival_time=arrival_time,
-            flight_duration=flight_duration,
-            flight_price=flight_price
-        )
-    else:
-        return "Flight not found", 404
+        if key_to_delete:
+            del cart[key_to_delete]
+            session['cart'] = cart  # Cập nhật lại giỏ hàng trong session
+            session.modified = True
+
+        # Tính lại tổng số lượng và giá
+        stats = utils.cart_stats(cart)
+        return jsonify({'success': True, 'stats': stats})
+
+    return jsonify({'success': False, 'message': 'Cart not found!'})
+
+
+@app.route('/cart/update', methods=['POST'])
+def update_cart():
+    flight_id = request.json.get('flight_id')
+    type_ticket = request.json.get('type_ticket')
+    quantity = int(request.json.get('quantity'))
+
+    if 'cart' in session and quantity > 0:
+        cart = session['cart']
+
+        # Cập nhật số lượng cho mục phù hợp
+        for item in cart.values():
+            if item['flight_id'] == flight_id and item['type_ticket'] == type_ticket:
+                item['quantity'] = quantity
+                break
+
+        # Lưu lại giỏ hàng vào session
+        session['cart'] = cart
+        session.modified = True
+
+        # Tính toán lại tổng tiền và số lượng
+        stats = utils.cart_stats(cart)
+        return jsonify({'success': True, 'stats': stats})
+
+    return jsonify({'success': False, 'message': 'Invalid cart or quantity'})
 
 
 if __name__ == '__main__':
